@@ -1,11 +1,5 @@
 @import '~terra-mixins';
-@import './variables';
-@import './mixins';
 
-.terra-MenuItem--buttonStyle {
-  @include terra-padding-end(1.429rem);
-
-  flex: 0 0 auto;
-  max-width: 100%;
-  position: relative;
+.terra-MenuItem {
+  padding: 0.714rem;
 }

@@ -28,6 +28,13 @@ const defaultProps = {
 
 const MenuItemGroup = ({ isSelectable, children, onChange, ...customProps }) => {
   const attributes = Object.assign({}, customProps);
+
+  // If this is set directly on the SingleSelectList.Item it uses the value of the isSelectable prop
+  // instead of the hardcoded value
+  attributes.isSelectable = false;
+  attributes.isSelected = false;
+  attributes.tabIndex = undefined;
+
   const items = children.map(child => (
     React.cloneElement(child, {
       isSelectable,
@@ -43,10 +50,8 @@ const MenuItemGroup = ({ isSelectable, children, onChange, ...customProps }) => 
   return (
     <SingleSelectList.Item
       {...attributes}
-      isSelectable={false}
-      onChange={listOnChange}
       content={(
-        <SingleSelectList>
+        <SingleSelectList onChange={listOnChange}>
           {items}
         </SingleSelectList>
       )}

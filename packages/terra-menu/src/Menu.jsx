@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'terra-popup';
+import SlideGroup from 'terra-slide-group';
 import 'terra-base/lib/baseStyles';
 import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
@@ -70,7 +71,7 @@ class Menu extends React.Component {
     });
 
     const initialMenu = (
-      <SubMenu>
+      <SubMenu key="MenuPage-0">
         {items}
       </SubMenu>
     );
@@ -86,7 +87,8 @@ class Menu extends React.Component {
   }
 
   handleItemSelection(event, item) {
-    this.push(<SubMenu title={item.props.text} onBack={this.pop}>{item.props.subMenuItems}</SubMenu>);
+    const index = this.state.stack.length;
+    this.push(<SubMenu key={`MenuPage-${index}`} title={item.props.text} onBack={this.pop}>{item.props.subMenuItems}</SubMenu>);
   }
 
   wrapOnClick(item) {
@@ -151,7 +153,7 @@ class Menu extends React.Component {
         targetRef={targetRef}
         isHeaderDisabled
       >
-        {this.state.stack[this.state.stack.length - 1]}
+        <SlideGroup items={this.state.stack} isAnimated />
       </Popup>
     );
   }
