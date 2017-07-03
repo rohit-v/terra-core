@@ -14,6 +14,7 @@ import MenuItemGroupSrc from '!raw-loader!terra-menu/src/MenuItemGroup';
 
 // Example Files
 import BasicMenu from './BasicMenu';
+import MenuBounded from './MenuBounded';
 
 const MenuExamples = () => (
   <div>
@@ -27,6 +28,8 @@ const MenuExamples = () => (
     <PropsTable id="menu-item-group-props" src={MenuItemGroupSrc} />
     <h2>Menu</h2>
     <BasicMenu />
+    <h2 id="bounded-popup" style={{ paddingTop: '20px' }}>Menu Bounded</h2>
+    <MenuBounded />
   </div>
 );
 

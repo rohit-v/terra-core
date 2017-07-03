@@ -15,4 +15,12 @@ module.exports = {
     browser
       .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-tests/default`);
   },
+  'boundingRef prop': (browser) => {
+    browser
+      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-tests/bounded`)
+      .waitForElementPresent('#bounded-button', 1000)
+      .click('#default-button')
+      .waitForElementPresent('.terra-SubMenu-header', 1000)
+      .waitForElementPresent('.terra-SubMenu-button', 1000);
+  },
 };

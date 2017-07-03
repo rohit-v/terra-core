@@ -11,8 +11,13 @@ module.exports = {
     screenshot(browser, 'terra-menu-item', done);
   },
 
-  'Displays a default menu': (browser) => {
+  'Displays a default Menu.item': (browser) => {
     browser
       .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-item-tests/default`);
+  },
+
+  'Displays a Menu.item with wrapped text': (browser) => {
+    browser
+      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-item-tests/wrapped-text`);
   },
 };

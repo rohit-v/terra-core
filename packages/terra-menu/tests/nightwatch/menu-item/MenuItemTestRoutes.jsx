@@ -5,12 +5,14 @@ import { Route } from 'react-router';
 import MenuItemTests from './MenuItemTests';
 
 // Test Cases
-import DefaultMenuItem from './DefaultMenuItem';
+import DefaultMenuItem from './MenuItemDefault';
+import MenuItemWrappedText from './MenuItemWrappedText';
 
 const routes = (
   <div>
     <Route path="/tests/menu-item-tests" component={MenuItemTests} />
     <Route path="/tests/menu-item-tests/default" component={DefaultMenuItem} />
+    <Route path="/tests/menu-item-tests/wrapped-text" component={MenuItemWrappedText} />
   </div>
 );
 

@@ -57,6 +57,8 @@ import ListTestRoutes from 'terra-list/tests/nightwatch/list/ListTestRoutes';
 import ListItemTestRoutes from 'terra-list/tests/nightwatch/list-item/ListItemTestRoutes';
 import SingleSelectListTestRoutes from 'terra-list/tests/nightwatch/single-select-list/SingleSelectListTestRoutes';
 import MultiSelectListTestRoutes from 'terra-list/tests/nightwatch/multi-select-list/MultiSelectListTestRoutes';
+import MenuTestRoutes from 'terra-menu/tests/nightwatch/menu/MenuTestRoutes';
+import MenuItemTestRoutes from 'terra-menu/tests/nightwatch/menu-item/MenuItemTestRoutes';
 import ModalTestRoutes from 'terra-modal/tests/nightwatch/ModalTestRoutes';
 import ModalManagerTestRoutes from 'terra-modal-manager/tests/nightwatch/ModalManagerTestRoutes';
 import PopupTestRoutes from 'terra-popup/tests/nightwatch/PopupTestRoutes';
@@ -132,6 +134,8 @@ ReactDOM.render((
     {StatusTestRoutes}
     {TableTestRoutes}
     {TimeInputTestRoutes}
+    {MenuTestRoutes}
+    {MenuItemTestRoutes}
     {ModalTestRoutes}
     {ModalManagerTestRoutes}
     {PopupTestRoutes}

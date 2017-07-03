@@ -1,14 +1,17 @@
 import React from 'react';
-import Button from 'terra-button';
 import Menu from 'terra-menu';
+import Button from 'terra-button';
 
-class BasicMenu extends React.Component {
+class MenuBounded extends React.Component {
   constructor(props) {
     super(props);
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
+    this.handleOnChange = this.handleOnChange.bind(this);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
+    this.setParentNode = this.setParentNode.bind(this);
+    this.getParentNode = this.getParentNode.bind(this);
     this.state = { open: false };
   }
 
@@ -20,6 +23,14 @@ class BasicMenu extends React.Component {
     return this.buttonNode;
   }
 
+  setParentNode(node) {
+    this.parentNode = node;
+  }
+
+  getParentNode() {
+    return this.parentNode;
+  }
+
   handleButtonClick() {
     this.setState({ open: true });
   }
@@ -28,10 +39,15 @@ class BasicMenu extends React.Component {
     this.setState({ open: false });
   }
 
+  handleOnChange() {
+    this.setState({ open: false });
+  }
+
   render() {
     return (
-      <div style={{ display: 'inline-block' }} ref={this.setButtonNode}>
+      <div style={{ height: '200px', width: '200px', background: 'aliceblue', overflow: 'hidden' }} ref={this.setParentNode}>
         <Menu
+          boundingRef={this.getParentNode}
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
@@ -49,16 +65,18 @@ class BasicMenu extends React.Component {
           <Menu.Item text="Default 3" key="3" onClick={() => alert('Default 3')} />
           <Menu.Item text="Default 4" key="4" />
           <Menu.Item text="Default 5" key="5" />
-          <Menu.ItemGroup isSelectable onChange={this.handleRequestClose} key="6">
+          <Menu.ItemGroup isSelectable onChange={this.handleOnChange} key="6">
             <Menu.Item text="Default 61" key="61" />
             <Menu.Item text="Default 62" key="62" />
             <Menu.Item text="Default 63" key="63" />
           </Menu.ItemGroup>
         </Menu>
-        <Button onClick={this.handleButtonClick} text="Example Button Text" />
+        <div style={{ display: 'inline-block' }} ref={this.setButtonNode}>
+          <Button text="Bounded Menu" onClick={this.handleButtonClick} />
+        </div>
       </div>
     );
   }
 }
 
-export default BasicMenu;
+export default MenuBounded;

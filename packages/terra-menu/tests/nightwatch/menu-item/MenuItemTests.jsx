@@ -6,7 +6,8 @@ import { Link } from 'react-router';
 const MenuTests = () => (
   <div>
     <ul>
-      <li><Link to="/tests/menu-item-tests/default">Default Menu.Item</Link></li>
+      <li><Link to="/tests/menu-item-tests/default">Menu.Item - Default</Link></li>
+      <li><Link to="/tests/menu-item-tests/wrapped-text">Menu.Item - Long Text that wraps</Link></li>
     </ul>
   </div>
 );

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'terra-popup';
-import SlideGroup from 'terra-slide-group';
 import 'terra-base/lib/baseStyles';
 import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
 import SubMenu from './_SubMenu';
+import MenuNavStack from './_MenuNavStack';
 import './Menu.scss';
 
 const propTypes = {
@@ -49,6 +49,35 @@ const defaultProps = {
 };
 
 class Menu extends React.Component {
+  static getPopupHeight(contentHeight) {
+    if (contentHeight >= 900) {
+      return 900;
+    } else if (contentHeight >= 675) {
+      return 675;
+    } else if (contentHeight >= 450) {
+      return 450;
+    }
+
+    return 225;
+  }
+
+  static getBoundsProps(boundingFrame, popupHeight) {
+    const boundsProps = {
+      contentWidth: 160,
+      contentHeight: popupHeight,
+    };
+
+    if (boundingFrame) {
+      boundsProps.contentHeightMax = boundingFrame.clientHeight;
+      boundsProps.contentWidthMax = boundingFrame.clientWidth;
+    } else {
+      boundsProps.contentHeightMax = window.innerHeight;
+      boundsProps.contentWidthMax = window.innerWidth;
+    }
+
+    return boundsProps;
+  }
+
   constructor(props) {
     super(props);
     this.handleRequestClose = this.handleRequestClose.bind(this);
@@ -56,6 +85,7 @@ class Menu extends React.Component {
     this.handleItemSelection = this.handleItemSelection.bind(this);
     this.wrapOnClick = this.wrapOnClick.bind(this);
     this.getInitialState = this.getInitialState.bind(this);
+    this.getContentHeight = this.getContentHeight.bind(this);
     this.push = this.push.bind(this);
     this.pop = this.pop.bind(this);
     this.state = this.getInitialState();
@@ -71,7 +101,7 @@ class Menu extends React.Component {
     });
 
     const initialMenu = (
-      <SubMenu key="MenuPage-0">
+      <SubMenu key="MenuPage-0" >
         {items}
       </SubMenu>
     );
@@ -81,6 +111,21 @@ class Menu extends React.Component {
     };
   }
 
+  getContentHeight() {
+    let contentCount = 0;
+
+    for (let i = 0; i < this.props.children.length; i += 1) {
+      const child = this.props.children[i];
+      if (child.props.children && child.props.children.length > 0) {
+        contentCount += child.props.children.length;
+      } else {
+        contentCount += 1;
+      }
+    }
+
+    return contentCount * 34;
+  }
+
 
   handleRequestClose() {
     this.setState(this.getInitialState());
@@ -88,7 +133,7 @@ class Menu extends React.Component {
 
   handleItemSelection(event, item) {
     const index = this.state.stack.length;
-    this.push(<SubMenu key={`MenuPage-${index}`} title={item.props.text} onBack={this.pop}>{item.props.subMenuItems}</SubMenu>);
+    this.push(<SubMenu key={`MenuPage-${index}`} title={item.props.text}>{item.props.subMenuItems}</SubMenu>);
   }
 
   wrapOnClick(item) {
@@ -138,6 +183,12 @@ class Menu extends React.Component {
       ...customProps
     } = this.props;
     const attributes = Object.assign({}, customProps);
+    const boundingFrame = this.props.boundingRef ? this.props.boundingRef() : undefined;
+
+    const contentHeight = this.getContentHeight();
+    const popupHeight = Menu.getPopupHeight(contentHeight);
+    const boundsProps = Menu.getBoundsProps(boundingFrame, popupHeight);
+    const popupDimensions = `${popupHeight / 9}x 10x`;
 
     return (
       <Popup
@@ -145,15 +196,16 @@ class Menu extends React.Component {
         boundingRef={boundingRef}
         isArrowDisplayed
         contentAttachment="bottom center"
+        contentDimensions={popupDimensions}
         classNameArrow={classNameArrow}
         classNameContent={classNameContent}
         classNameOverlay={classNameOverlay}
         isOpen={isOpen}
-        onRequestClose={this.wrapOnRequestClose}
+        onRequestClose={this.wrapOnRequestClose()}
         targetRef={targetRef}
         isHeaderDisabled
       >
-        <SlideGroup items={this.state.stack} isAnimated />
+        <MenuNavStack {...boundsProps} items={this.state.stack} onRequestClose={this.wrapOnRequestClose()} onRequestBack={this.pop} />
       </Popup>
     );
   }

@@ -7,6 +7,17 @@
   height: 2.143rem;
   line-height: 1;
   width: 100%;
+
+  .terra-SubMenu-title {
+    font-size: 2.143rem;
+    font-weight: normal;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+  }
 }
 
 .terra-SubMenu-button {

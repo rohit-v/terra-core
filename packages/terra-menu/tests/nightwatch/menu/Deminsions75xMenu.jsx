@@ -1,8 +1,7 @@
 import React from 'react';
-import Button from 'terra-button';
-import Menu from 'terra-menu';
+import Menu from '../../../lib/Menu';
 
-class BasicMenu extends React.Component {
+class Deminsions75xMenu extends React.Component {
   constructor(props) {
     super(props);
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -30,23 +29,18 @@ class BasicMenu extends React.Component {
 
   render() {
     return (
-      <div style={{ display: 'inline-block' }} ref={this.setButtonNode}>
+      <div>
+        <div>
+          This menu should have a calculated height of 75x.
+        </div>
         <Menu
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
         >
           <Menu.Item text="Default 1" key="1" />
-          <Menu.Item
-            text="Default 2"
-            key="2"
-            subMenuItems={[
-              <Menu.Item text="Default 2.1" key="2.1" />,
-              <Menu.Item text="Default 2.2" key="2.2" />,
-              <Menu.Item text="Default 2.3" key="2.3" />,
-            ]}
-          />
-          <Menu.Item text="Default 3" key="3" onClick={() => alert('Default 3')} />
+          <Menu.Item text="Default 2" key="2" />
+          <Menu.Item text="Default 3" key="3" />
           <Menu.Item text="Default 4" key="4" />
           <Menu.Item text="Default 5" key="5" />
           <Menu.ItemGroup isSelectable onChange={this.handleRequestClose} key="6">
@@ -54,11 +48,26 @@ class BasicMenu extends React.Component {
             <Menu.Item text="Default 62" key="62" />
             <Menu.Item text="Default 63" key="63" />
           </Menu.ItemGroup>
+          <Menu.Item text="Default 7" key="7" />
+          <Menu.Item text="Default 8" key="8" />
+          <Menu.Item text="Default 9" key="9" />
+          <Menu.Item text="Default 10" key="10" />
+          <Menu.Item text="Default 11" key="11" />
+          <Menu.Item text="Default 12" key="12" />
+          <Menu.Item text="Default 13" key="13" />
+          <Menu.Item text="Default 14" key="14" />
+          <Menu.ItemGroup isSelectable onChange={this.handleRequestClose} key="15">
+            <Menu.Item text="Default 151" key="151" />
+            <Menu.Item text="Default 152" key="152" />
+            <Menu.Item text="Default 153" key="153" />
+          </Menu.ItemGroup>
         </Menu>
-        <Button onClick={this.handleButtonClick} text="Example Button Text" />
+        <button id="default-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
+          Default Menu
+        </button>
       </div>
     );
   }
 }
 
-export default BasicMenu;
+export default Deminsions75xMenu;
