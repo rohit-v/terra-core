@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Tether from 'tether';
 
+/**
+ * This is a wrapper element around a Tether implementation.
+ * Additional Tether can be found at http://tether.io/.
+ */
+
 const ATTACHMENT_POSITIONS = [
   'top left',
   'top center',
@@ -33,7 +38,7 @@ const propTypes = {
    */
   content: PropTypes.element,
   /**
-   * String pair of top, middle, bottom, and left, center, right.
+   * String pair seperated by a space using values of top, middle, bottom, and left, center, right.
    */
   contentAttachment: PropTypes.oneOf(ATTACHMENT_POSITIONS).isRequired,
   /**
@@ -199,7 +204,7 @@ class TetherComponent extends React.Component {
       tetherOptions.offset = contentOffset;
     }
     if (isEnabled !== undefined) {
-      tetherOptions.enabled = true;
+      tetherOptions.enabled = isEnabled;
     }
 
     if (!this.tether) {

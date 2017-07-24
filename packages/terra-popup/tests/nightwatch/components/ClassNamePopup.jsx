@@ -9,7 +9,11 @@ class ClassNamePopup extends React.Component {
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
-    this.state = { open: false };
+    this.state = { open: true };
+  }
+
+  componentDidMount() {
+    this.forceUpdate();
   }
 
   setButtonNode(node) {
@@ -36,7 +40,6 @@ class ClassNamePopup extends React.Component {
           classNameContent="terra-TestClass-content"
           classNameOverlay="terra-TestClass-overlay"
           contentAttachment="top center"
-          contentDimensions="50x 25x"
           isArrowDisplayed
           isOpen={this.state.open}
           onRequestClose={this.handleRequestClose}

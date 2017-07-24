@@ -1,30 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import onClickOutside from 'react-onclickoutside';
 import ContentContainer from 'terra-content-container';
 import IconClose from 'terra-icon/lib/icon/IconClose';
 import FocusTrap from 'focus-trap-react';
-import './PopupContent.scss';
+import styles from './PopupContent.scss';
 
+const cx = classNames.bind(styles);
 /**
  * Directional classes to be applied by a presenting component.
  */
-const CONTENT_CLASSES = {
-  top: 'terra-PopupContent--arrowTop',
-  bottom: 'terra-PopupContent--arrowBottom',
-  left: 'terra-PopupContent--arrowLeft',
-  right: 'terra-PopupContent--arrowRight',
+const CONTENT_ATTRS = {
+  top: 'data-arrow-top',
+  bottom: 'data-arrow-bottom',
+  left: 'data-arrow-left',
+  right: 'data-arrow-right',
 };
 
 /**
  * Mirrored directional classes, used to flip the arrow on repositioning.
  */
-const CONTENT_OPPOSITE_CLASSES = {
-  top: 'terra-PopupContent--arrowBottom',
-  bottom: 'terra-PopupContent--arrowTop',
-  left: 'terra-PopupContent--arrowRight',
-  right: 'terra-PopupContent--arrowLeft',
+const MIRRORED_CONTENT_ATTRS = {
+  top: 'data-arrow-bottom',
+  bottom: 'data-arrow-top',
+  left: 'data-arrow-right',
+  right: 'data-arrow-left',
 };
 
 /**
@@ -47,9 +48,30 @@ const ARROW_POSITIONS = [
 /**
  * Margin value used for calculations.
  */
-const POPUP_MARGIN = 9;
+const POPUP_MARGIN = 10;
+
+/**
+ * Rounded corner size to be used when calculating the arrow offset.
+ */
+const CORNER_SIZE = 3;
 
 const propTypes = {
+  /**
+   * The children to be presented as the popup's content.
+   */
+  children: PropTypes.node.isRequired,
+  /**
+   * The height value in px, to be applied to the content container.
+   */
+  contentHeight: PropTypes.number.isRequired,
+  /**
+   * The width value in px, to be applied to the content container.
+   */
+  contentWidth: PropTypes.number.isRequired,
+  /**
+   * The function that should be triggered when a close is indicated.
+   */
+  onRequestClose: PropTypes.func.isRequired,
   /**
    * The arrow to be placed within the popup frame.
    */
@@ -59,11 +81,7 @@ const propTypes = {
    */
   arrowPosition: PropTypes.oneOf(ARROW_POSITIONS),
   /**
-   * The children to be presented as the popup's content.
-   */
-  children: PropTypes.node.isRequired,
-  /**
-   * CSS classnames that are append to the popup content body.
+   * CSS classnames that are appended to the popup content body.
    */
   classNameInner: PropTypes.string,
   /**
@@ -79,29 +97,17 @@ const propTypes = {
    */
   closeOnResize: PropTypes.bool,
   /**
-   * A the px value of height to be applied to the content container.
-   */
-  contentHeight: PropTypes.number.isRequired,
-  /**
-   * The maximum height to set for popup content in px, also used with responsive behavior for actual height.
+   * The maximum height value in px, to be applied to the content container. Used with responsive behavior for actual height.
    */
   contentHeightMax: PropTypes.number,
   /**
-   * A the px value of width to be applied to the content container.
-   */
-  contentWidth: PropTypes.number.isRequired,
-  /**
-   * The maximum width of the popup content in px, also used with responsive behavior for actual width.
+   * The maximum width value in px, to be applied to the content container. Used with responsive behavior for actual width.
    */
   contentWidthMax: PropTypes.number,
   /**
    * Should the default behavior, that inserts a header when constraints are breached, be disabled.
    */
   isHeaderDisabled: PropTypes.bool,
-  /**
-   * The function that should be triggered when a close is indicated.
-   */
-  onRequestClose: PropTypes.func.isRequired,
   /**
    * The function returning the frame html reference.
    */
@@ -120,16 +126,16 @@ const defaultProps = {
 };
 
 class PopupContent extends React.Component {
-  static getContentStyle(height, maxHeight, width, maxWidth) {
+  static getContentStyle(arrow, arrowPosition, height, maxHeight, width, maxWidth) {
     const validHeight = maxHeight <= 0 || height <= maxHeight ? height : maxHeight;
     const validWidth = maxWidth <= 0 || width <= maxWidth ? width : maxWidth;
     return { height: `${validHeight.toString()}px`, width: `${validWidth.toString()}px` };
   }
 
   static addPopupHeader(children, onRequestClose) {
-    const icon = <IconClose tabIndex="0" height="30" width="30" />;
-    const button = <button className="terra-PopupContent-close" onClick={onRequestClose} style={{ float: 'right' }}>{icon}</button>;
-    const header = <div className="terra-PopupContent-header">{button}</div>;
+    const icon = <IconClose height="20" width="20" />;
+    const button = <button className={cx('close')} onClick={onRequestClose}>{icon}</button>;
+    const header = <div className={cx('header')}>{button}</div>;
     return <ContentContainer header={header} fill>{children}</ContentContainer>;
   }
 
@@ -233,7 +239,7 @@ class PopupContent extends React.Component {
     } = this.props;
 
     const showArrow = PopupContent.shouldShowArrow(arrow, arrowPosition, contentHeight, contentHeightMax, contentWidth, contentWidthMax);
-    const contentStyle = PopupContent.getContentStyle(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
+    const contentStyle = PopupContent.getContentStyle(arrow, arrowPosition, contentHeight, contentHeightMax, contentWidth, contentWidthMax);
     const isFullScreen = PopupContent.isFullScreen(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
 
     let content = children;
@@ -246,16 +252,11 @@ class PopupContent extends React.Component {
       arrowContent = arrow;
     }
 
-    const popupContentClassNames = classNames([
-      'terra-PopupContent',
-      { 'terra-PopupContent-showArrow': showArrow },
-      { [`${CONTENT_CLASSES[arrowPosition]}`]: showArrow },
-      customProps.className,
-    ]);
-
-    const innerClassNames = classNames([
-      'terra-PopupContent-inner',
-      { 'terra-PopupContent-inner--isFullScreen': isFullScreen },
+    const roundedCorners = arrow && !isFullScreen;
+    const innerClassNames = cx([
+      'inner',
+      { isFullScreen },
+      { roundedCorners },
       classNameInner,
     ]);
 
@@ -265,7 +266,7 @@ class PopupContent extends React.Component {
 
     return (
       <FocusTrap>
-        <div {...customProps} tabIndex="0" className={popupContentClassNames} ref={refCallback}>
+        <div {...customProps} tabIndex="0" className={cx('popupContent')} ref={refCallback}>
           {arrowContent}
           <div className={innerClassNames} style={contentStyle}>
             {content}
@@ -280,7 +281,11 @@ PopupContent.propTypes = propTypes;
 PopupContent.defaultProps = defaultProps;
 
 const onClickOutsideContent = onClickOutside(PopupContent);
-onClickOutsideContent.positionClasses = CONTENT_CLASSES;
-onClickOutsideContent.oppositePositionClasses = CONTENT_OPPOSITE_CLASSES;
+onClickOutsideContent.Opts = {
+  positionAttrs: CONTENT_ATTRS,
+  mirroredPositionAttrs: MIRRORED_CONTENT_ATTRS,
+  popupMargin: POPUP_MARGIN,
+  cornerSize: CORNER_SIZE,
+};
 
 export default onClickOutsideContent;

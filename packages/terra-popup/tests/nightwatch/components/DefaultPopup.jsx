@@ -8,7 +8,11 @@ class DefaultPopup extends React.Component {
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
-    this.state = { open: false };
+    this.state = { open: true };
+  }
+
+  componentDidMount() {
+    this.forceUpdate();
   }
 
   setButtonNode(node) {
@@ -31,6 +35,8 @@ class DefaultPopup extends React.Component {
     return (
       <div>
         <Popup
+          classNameArrow="test-arrow"
+          classNameContent="test-content"
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}

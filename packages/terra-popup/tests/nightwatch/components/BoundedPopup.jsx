@@ -10,7 +10,11 @@ class BoundedPopup extends React.Component {
     this.getButtonNode = this.getButtonNode.bind(this);
     this.setParentNode = this.setParentNode.bind(this);
     this.getParentNode = this.getParentNode.bind(this);
-    this.state = { open: false };
+    this.state = { open: true };
+  }
+
+  componentDidMount() {
+    this.forceUpdate();
   }
 
   setButtonNode(node) {
@@ -42,6 +46,10 @@ class BoundedPopup extends React.Component {
       <div style={{ height: '200px', width: '200px', background: 'aliceblue' }} ref={this.setParentNode}>
         <Popup
           boundingRef={this.getParentNode}
+          classNameArrow="test-arrow"
+          classNameContent="test-content"
+          contentHeight="240"
+          contentWidth="320"
           isOpen={this.state.open}
           onRequestClose={this.handleRequestClose}
           targetRef={this.getButtonNode}

@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
-import './Button.scss';
+import styles from './Button.scss';
+
+const cx = classNames.bind(styles);
 
 const propTypes = {
   /**
@@ -38,7 +40,7 @@ const propTypes = {
    */
   onClick: PropTypes.func,
   /**
-   * Sets the button size. One of tiny, small, medium, large, huge
+   * Sets the button size. One of `tiny`, `small`, `medium`, `large`, `huge`
    */
   size: PropTypes.oneOf(['tiny', 'small', 'medium', 'large', 'huge']),
   /**
@@ -46,11 +48,11 @@ const propTypes = {
    */
   text: PropTypes.string,
   /**
-   * Sets the button type. One of button, submit, or reset
+   * Sets the button type. One of `button`, `submit`, or `reset`
    */
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   /**
-   * Sets the button variant. One of primary, secondary, or link
+   * Sets the button variant. One of `primary`, `secondary`, or `link`
    */
   variant: PropTypes.oneOf(['default', 'link', 'primary', 'secondary']),
 };
@@ -78,15 +80,15 @@ const Button = ({
   ...customProps
   }) => {
   const attributes = Object.assign({}, customProps);
-  const buttonText = text ? <span className="terra-Button-text">{text}</span> : null;
+  const buttonText = text ? <span className={styles.text}>{text}</span> : null;
 
-  attributes.className = classNames([
-    'terra-Button',
-    `terra-Button--${variant}`,
+  attributes.className = cx([
+    'button',
+    variant,
     { 'is-disabled': isDisabled },
-    { [`terra-Button--${size}`]: size },
-    { 'terra-Button--block': isBlock },
-    { 'terra-Button--compact': isCompact },
+    size,
+    { block: isBlock },
+    { compact: isCompact },
     attributes.className,
   ]);
 

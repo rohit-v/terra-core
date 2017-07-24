@@ -9,19 +9,9 @@ class PopupNoHeader extends React.Component {
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.handleOnChange = this.handleOnChange.bind(this);
-    this.setButtonNode = this.setButtonNode.bind(this);
-    this.getButtonNode = this.getButtonNode.bind(this);
     this.setParentNode = this.setParentNode.bind(this);
     this.getParentNode = this.getParentNode.bind(this);
     this.state = { open: false };
-  }
-
-  setButtonNode(node) {
-    this.buttonNode = node;
-  }
-
-  getButtonNode() {
-    return this.buttonNode;
   }
 
   setParentNode(node) {
@@ -49,16 +39,16 @@ class PopupNoHeader extends React.Component {
       <div style={{ height: '200px', width: '200px', background: 'aliceblue', overflow: 'hidden' }} ref={this.setParentNode}>
         <Popup
           boundingRef={this.getParentNode}
+          contentHeight="240"
+          contentWidth="320"
           isHeaderDisabled
           isOpen={this.state.open}
           onRequestClose={this.handleRequestClose}
-          targetRef={this.getButtonNode}
+          targetRef={() => document.getElementById('popup-no-header')}
         >
           <ExamplePopupContent onChange={this.handleOnChange} />
         </Popup>
-        <div style={{ display: 'inline-block' }} ref={this.setButtonNode}>
-          <Button text="No Header Popup" onClick={this.handleButtonClick} />
-        </div>
+        <Button id="popup-no-header" text="No Header Popup" onClick={this.handleButtonClick} />
       </div>
     );
   }

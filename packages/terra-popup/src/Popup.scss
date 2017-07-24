@@ -1,5 +1,6 @@
-@import '~terra-mixins';
+@import './variables';
 
+// This style cannot be converted to css modules, as it's the class prefix appended by tether.
 .terra-Popup-element {
-  z-index: 7000 + 1;
+  z-index: var(--terra-popup-element-z-index);
 }

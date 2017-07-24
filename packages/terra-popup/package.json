@@ -21,14 +21,13 @@
   },
   "homepage": "https://github.com/cerner/terra-core#readme",
   "devDependencies": {
-    "terra-toolkit": "^0.4.0"
+    "terra-props-table": "^1.1.0"
   },
   "peerDependencies": {
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "terra-base": "^0.6.0",
-    "terra-icon": "^0.6.0",
-    "terra-mixins": "^1.3.0"
+    "terra-base": "^1.1.0",
+    "terra-icon": "^1.1.0"
   },
   "dependencies": {
     "classnames": "^2.2.5",
@@ -37,10 +36,9 @@
     "react-onclickoutside": "^5.11.1",
     "react-portal": "^3.0.0",
     "tether": "^1.4.0",
-    "terra-base": "^0.6.0",
-    "terra-content-container": "^0.4.0",
-    "terra-icon": "^0.6.0",
-    "terra-mixins": "^1.3.0"
+    "terra-base": "^1.1.0",
+    "terra-content-container": "^1.1.0",
+    "terra-icon": "^1.1.0"
   },
   "scripts": {
     "compile": "npm run compile:clean && npm run compile:build",
@@ -52,9 +50,9 @@
     "test": "npm run test:spec && npm run test:nightwatch-default",
     "test:spec": "$(cd ..; npm bin)/jest --config ../../jestconfig.json",
     "test:all": "npm run test:nightwatch-default && npm run test:nightwatch-chrome && npm run test:nightwatch-firefox && npm run test:nightwatch-safari",
-    "test:nightwatch-default": "SPECTRE_TEST_SUITE=terra-popup node ./node_modules/terra-toolkit/lib/scripts/nightwatch.js",
-    "test:nightwatch-chrome": "SPECTRE_TEST_SUITE=terra-popup node ./node_modules/terra-toolkit/lib/scripts/nightwatch.js chrome",
-    "test:nightwatch-firefox": "SPECTRE_TEST_SUITE=terra-popup node ./node_modules/terra-toolkit/lib/scripts/nightwatch.js firefox",
-    "test:nightwatch-safari": "SPECTRE_TEST_SUITE=terra-popup node ./node_modules/terra-toolkit/lib/scripts/nightwatch-non-parallel.js safari"
+    "test:nightwatch-default": "SPECTRE_TEST_SUITE=terra-popup node ../../node_modules/terra-toolkit/lib/scripts/nightwatch.js",
+    "test:nightwatch-chrome": "SPECTRE_TEST_SUITE=terra-popup node ../../node_modules/terra-toolkit/lib/scripts/nightwatch.js chrome",
+    "test:nightwatch-firefox": "SPECTRE_TEST_SUITE=terra-popup node ../../node_modules/terra-toolkit/lib/scripts/nightwatch.js firefox",
+    "test:nightwatch-safari": "SPECTRE_TEST_SUITE=terra-popup node ../../node_modules/terra-toolkit/lib/scripts/nightwatch-non-parallel.js safari"
   }
 }
