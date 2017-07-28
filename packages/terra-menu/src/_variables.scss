@@ -1,0 +1,39 @@
+:root {
+
+  // Submenu Header variables
+  --terra-menu-submenu-header-background-color: #fff;
+  --terra-menu-submenu-header-border-bottom: 1px solid #dedfe0;
+  --terra-menu-submenu-header-title-color: #1c1f21;
+  --terra-menu-submenu-header-title-font-size: 12px;
+  --terra-menu-submenu-header-title-line-height: 1.1667;
+  --terra-menu-submenu-header-title-margin: 7px 0 7px 0;
+  --terra-menu-submenu-header-buttons-icon-color: #1c1f21;
+  --terra-menu-submenu-header-buttons-icon-font-size: 12px;
+  --terra-menu-submenu-header-buttons-padding: 8px;
+  --terra-menu-submenu-header-buttons-margin: 0;
+  --terra-menu-submenu-header-buttons-hover-color: #111;
+
+  // Fullscreen menu header variables
+  --terra-menu-fullscreen-header-background-color: #fff;
+  --terra-menu-fullscreen-header-border-bottom: 1px solid #dedfe0;
+  --terra-menu-fullscreen-header-title-color: #1c1f21;
+  --terra-menu-fullscreen-header-title-font-size: 1rem;
+  --terra-menu-fullscreen-header-title-line-height: 1.2;
+  --terra-menu-fullscreen-header-title-margin: 0.5714rem 0 0.5714rem 1rem;
+  --terra-menu-fullscreen-header-buttons-margin: 0.3571rem 0.7134rem;
+
+
+  // Menu content variables
+  --terra-menu-background-color: #fff;
+
+  // Submenu content variables
+  --terra-menu-submenu-background-color: #f9f9f9;
+
+  // Menu Item variables
+  --terra-menu-item-selection-icon-color: #1c1f21;
+  --terra-menu-item-selection-icon-font-size: 12px;
+  --terra-menu-item-label-color: #1c1f21;
+  --terra-menu-item-label-font-size: 13px;
+  --terra-menu-item-submenu-indicator-icon-color: #9b9fa1;
+  --terra-menu-item-submenu-indicator-icon-font-size: 10px;
+}

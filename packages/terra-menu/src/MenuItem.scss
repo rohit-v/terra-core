@@ -1,5 +1,7 @@
-@import '~terra-mixins';
+/* stylelint-disable selector-class-pattern  */
 
-.terra-MenuItem {
-  padding: 0.714rem;
+:local {
+  .item {
+    padding: 0.714rem;
+  }
 }

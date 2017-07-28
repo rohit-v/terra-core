@@ -5,7 +5,11 @@ import IconLeft from 'terra-icon/lib/icon/IconLeft';
 import ContentContainer from 'terra-content-container';
 import IconClose from 'terra-icon/lib/icon/IconClose';
 import Arrange from 'terra-arrange';
-import './SubMenu.scss';
+import classNames from 'classnames/bind';
+import 'terra-base/lib/baseStyles';
+import styles from './SubMenu.scss';
+
+const cx = classNames.bind(styles);
 
 const propTypes = {
   title: PropTypes.string,
@@ -28,25 +32,25 @@ const SubMenu = (props) => {
   let header;
 
   if (props.title || props.onBack || props.onClose) {
-    const closeIcon = <IconClose tabIndex="0" height="30" width="30" />;
+    const closeIcon = <IconClose tabIndex="0" />;
     const closeButton = props.onClose ? (
-      <button className="terra-SubMenu-button" onClick={props.onClose}>
+      <button className={cx(['header-button'])} onClick={props.onClose}>
         {closeIcon}
       </button>
     ) : null;
 
-    const backIcon = <IconLeft tabIndex="0" height="30" width="30" />;
+    const backIcon = <IconLeft tabIndex="0" />;
     const backButton = props.onBack ? (
-      <button className="terra-SubMenu-button" onClick={props.onBack}>
+      <button className={cx(['header-button'])} onClick={props.onBack}>
         {backIcon}
       </button>
     ) : null;
 
-    const titleElement = <h1 className="terra-SubMenu-title">{props.title}</h1>;
+    const titleElement = <h1 className={cx(['header-title'])}>{props.title}</h1>;
 
     header = (
       <Arrange
-        className="terra-SubMenu-header"
+        className={cx(['header', { fullscreen: props.onClose }])}
         fitStart={backButton}
         fitEnd={closeButton}
         fill={titleElement}

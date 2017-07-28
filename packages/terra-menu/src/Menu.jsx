@@ -6,7 +6,6 @@ import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
 import SubMenu from './_SubMenu';
 import MenuNavStack from './_MenuNavStack';
-import './Menu.scss';
 
 const propTypes = {
   /**
@@ -50,20 +49,38 @@ const defaultProps = {
 
 class Menu extends React.Component {
   static getPopupHeight(contentHeight) {
-    if (contentHeight >= 900) {
-      return 900;
-    } else if (contentHeight >= 675) {
-      return 675;
-    } else if (contentHeight >= 450) {
-      return 450;
+    if (contentHeight <= 40) {
+      return 40;
+    } else if (contentHeight <= 80) {
+      return 80;
+    } else if (contentHeight <= 120) {
+      return 120;
+    } else if (contentHeight <= 160) {
+      return 160;
+    } else if (contentHeight <= 240) {
+      return 240;
+    } else if (contentHeight <= 320) {
+      return 320;
+    } else if (contentHeight <= 400) {
+      return 400;
+    } else if (contentHeight <= 480) {
+      return 480;
+    } else if (contentHeight <= 560) {
+      return 560;
+    } else if (contentHeight <= 640) {
+      return 640;
+    } else if (contentHeight <= 720) {
+      return 720;
+    } else if (contentHeight <= 800) {
+      return 800;
     }
 
-    return 225;
+    return 880;
   }
 
   static getBoundsProps(boundingFrame, popupHeight) {
     const boundsProps = {
-      contentWidth: 160,
+      contentWidth: 240,
       contentHeight: popupHeight,
     };
 
@@ -188,7 +205,6 @@ class Menu extends React.Component {
     const contentHeight = this.getContentHeight();
     const popupHeight = Menu.getPopupHeight(contentHeight);
     const boundsProps = Menu.getBoundsProps(boundingFrame, popupHeight);
-    const popupDimensions = `${popupHeight / 9}x 10x`;
 
     return (
       <Popup
@@ -196,7 +212,8 @@ class Menu extends React.Component {
         boundingRef={boundingRef}
         isArrowDisplayed
         contentAttachment="bottom center"
-        contentDimensions={popupDimensions}
+        contentHeight={popupHeight.toString()}
+        contentWidth="240"
         classNameArrow={classNameArrow}
         classNameContent={classNameContent}
         classNameOverlay={classNameOverlay}

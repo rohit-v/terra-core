@@ -1,36 +1,57 @@
-@import '~terra-mixins';
+@import './variables';
 
-.terra-SubMenu-header {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.15);
-  color: #999;
-  font-size: 2.143rem;
-  height: 2.143rem;
-  line-height: 1;
-  width: 100%;
+:local {
+  /* stylelint-disable selector-class-pattern */
+  .header {
+    background-color: var(--terra-menu-submenu-header-background-color);
+    border-bottom: var(--terra-menu-submenu-header-border-bottom);
+    width: 100%;
 
-  .terra-SubMenu-title {
-    font-size: 2.143rem;
-    font-weight: normal;
-    line-height: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-break: normal;
-    word-wrap: normal;
-  }
-}
+    .header-title {
+      color: var(--terra-menu-submenu-header-title-color);
+      font-size: var(--terra-menu-submenu-header-title-font-size);
+      font-weight: normal;
+      line-height: var(--terra-menu-submenu-header-title-line-height);
+      margin: var(--terra-menu-submenu-header-title-margin);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-break: normal;
+      word-wrap: normal;
+    }
 
-.terra-SubMenu-button {
-  background: 0 0;
-  border: 0;
-  color: #999;
-  cursor: pointer;
-  font-size: 1.45rem;
-  font-weight: bold;
-  line-height: 1;
-  padding: 0 10px 0 0;
+    .header-button {
+      background: 0 0;
+      border: 0;
+      color: var(--terra-menu-submenu-header-buttons-icon-color);
+      cursor: pointer;
+      font-size: var(--terra-menu-submenu-header-buttons-icon-font-size);
+      font-weight: bold;
+      margin: var(--terra-menu-submenu-header-buttons-margin);
+      padding: var(--terra-menu-submenu-header-buttons-padding);
 
-  &:hover {
-    color: #111;
+      &:hover {
+        color: var(--terra-menu-submenu-header-buttons-hover-color);
+      }
+    }
+
+
+    &.fullscreen {
+      background-color: var(--terra-menu-fullscreen-header-background-color);
+      border-bottom: var(--terra-menu-fullscreen-header-border-bottom);
+
+      .header-title {
+        color: var(--terra-menu-fullscreen-header-title-color);
+        font-size: var(--terra-menu-fullscreen-header-title-font-size);
+        line-height: var(--terra-menu-fullscreen-header-title-line-height);
+        margin: var(--terra-menu-fullscreen-header-title-margin);
+      }
+
+      .header-button {
+        margin: var(--terra-menu-submenu-header-buttons-margin);
+      }
+    
+    }
+
   }
 }

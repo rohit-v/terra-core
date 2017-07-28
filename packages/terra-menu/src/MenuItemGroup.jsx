@@ -2,22 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SingleSelectList from 'terra-list/lib/SingleSelectList';
 import 'terra-base/lib/baseStyles';
-import './MenuItemGroup.scss';
 
 const propTypes = {
   /**
    * Indicates if the group should have toggle-style selection
-  **/
+   */
   isSelectable: PropTypes.bool,
 
   /**
    * Menu.Items to be grouped together
-  **/
+   */
   children: PropTypes.node.isRequired,
 
   /**
    * Callback function called when selected index changes
-   **/
+   */
   onChange: PropTypes.func,
 };
 

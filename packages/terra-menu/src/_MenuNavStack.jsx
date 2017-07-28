@@ -26,7 +26,7 @@ const propTypes = {
 
   /**
    * The function that should be triggered when a back is indicated.
-   **/
+   */
   onRequestBack: PropTypes.func.isRequired,
 
   items: PropTypes.array,
