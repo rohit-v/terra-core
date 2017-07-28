@@ -22,28 +22,25 @@ const defaultProps = {
   disableOverflow: false,
 };
 
-class BaseLayout extends React.Component {
+const BaseLayout = ({
+    children,
+    disableOverflow,
+    ...customProps
+  }) => {
+  const layoutClassNames = cx([
+    'inner',
+    { 'disable-overflow': disableOverflow },
+    customProps.className,
+  ]);
 
-  render() {
-    const {
-      children,
-      disableOverflow,
-      ...customProps
-    } = this.props;
-
-    const layoutClassNames = cx([
-      'inner',
-      { 'disable-overflow': disableOverflow },
-      customProps.className,
-    ]);
-
-    return (
-      <div {...customProps} className={layoutClassNames}>
-        {children}
-      </div>
-    );
-  }
-}
+  // Investigate this vs the disable-overflow class.
+  // return React.Children.only(this.props.children)
+  return (
+    <div {...customProps} className={layoutClassNames}>
+      {children}
+    </div>
+  );
+};
 
 BaseLayout.propTypes = propTypes;
 BaseLayout.defaultProps = defaultProps;

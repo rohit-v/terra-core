@@ -46,7 +46,7 @@ import AlertTestRoutes from 'terra-alert/tests/nightwatch/AlertTestRoutes';
 import ArrangeTestRoutes from 'terra-arrange/tests/nightwatch/ArrangeTestRoutes';
 import BadgeTestRoutes from 'terra-badge/tests/nightwatch/BadgeTestRoutes';
 import BaseTestRoutes from 'terra-base/tests/nightwatch/BaseTestRoutes';
-import BaseLayoutTestRoutes from 'terra-base/tests/nightwatch/BaseLayoutTestRoutes';
+import BaseLayoutTestRoutes from 'terra-base-layout/tests/nightwatch/BaseLayoutTestRoutes';
 import ButtonTestRoutes from 'terra-button/tests/nightwatch/ButtonTestRoutes';
 import ButtonGroupTestRoutes from 'terra-button-group/tests/nightwatch/ButtonGroupTestRoutes';
 import ContentContainerTestRoutes from 'terra-content-container/tests/nightwatch/ContentContainerTestRoutes';
@@ -163,4 +163,4 @@ ReactDOM.render((
     {SlideGroupTestRoutes}
     {ProfileImageTestRoutes}
   </Router>
-), document.getElementById('root'));
+), document.body);
