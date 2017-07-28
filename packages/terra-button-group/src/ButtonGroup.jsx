@@ -1,44 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import ButtonGroupButton from './ButtonGroupButton';
-import './ButtonGroup.scss';
+import styles from './ButtonGroup.scss';
+
+const cx = classNames.bind(styles);
 
 const propTypes = {
   /**
    * Button group button components that should be grouped together
-   **/
+   */
   buttons: PropTypes.arrayOf(PropTypes.element),
 
   /**
    * Child nodes
-   **/
+   */
   children: PropTypes.node,
 
   /**
    * Indicates if the buttons should have reduced top and bottom padding
-   **/
+   */
   isCompact: PropTypes.bool,
 
   /**
    * Indicates if the button group should have toggle-style selectability
-   **/
+   */
   isSelectable: PropTypes.bool,
 
   /**
    * Callback function when the state changes
-   **/
+   */
   onChange: PropTypes.func,
 
   /**
    * Sets the button size. One of `tiny`, `small`, `medium`, `large`, `huge`
-   **/
+   */
   size: PropTypes.oneOf(['tiny', 'small', 'medium', 'large', 'huge']),
 
   /**
    * Sets the button group style variation. One of `defaut` or `secondary`
-   **/
+   */
   variant: PropTypes.oneOf(['default', 'secondary']),
 };
 
@@ -96,7 +98,7 @@ class ButtonGroup extends React.Component {
 
   render() {
     const { onChange, variant, size, isCompact, isSelectable, buttons, children, ...customProps } = this.props;
-    const buttonGroupClassNames = classNames(['terra-ButtonGroup',
+    const buttonGroupClassNames = cx(['button-group',
       customProps.className,
     ]);
 

@@ -1,5 +1,5 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-/* eslint-disable no-unused-expressions*/
+/* eslint-disable no-unused-expressions */
 // eslint-disable-next-line import/no-extraneous-dependencies
 const screenshot = require('terra-toolkit').screenshot;
 
@@ -76,6 +76,28 @@ module.exports = {
     browser.expect.element('.terra-TestClass-overlay').to.be.present;
     browser.expect.element('.terra-TestClass-content').to.be.present;
     browser.expect.element('.terra-TestClass-arrow').to.be.present;
+  },
+
+  'popup inside modal - close on ESC': (browser) => {
+    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/popup-tests/popup-inside-modal`);
+    browser.click('.disclose');
+    browser.click('#popup-in-modal');
+    browser.expect.element('.test-content').to.be.present;
+    browser.keys([browser.Keys.ESCAPE]);
+    browser.waitForElementNotPresent('.test-content', 1000);
+    browser.assert.elementPresent('div[role="document"]');
+    browser.keys([browser.Keys.ESCAPE]);
+    browser.assert.elementNotPresent('div[role="document"]');
+  },
+
+  'popup inside modal - close on CLICK': (browser) => {
+    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/popup-tests/popup-inside-modal`);
+    browser.click('.disclose');
+    browser.click('#popup-in-modal');
+    browser.expect.element('.test-content').to.be.present;
+    browser.moveTo('#default-button', 200, 0);
+    browser.mouseButtonClick(0);
+    browser.waitForElementNotPresent('.test-content', 1000);
   },
 
   'contentAttachment prop - HORIZONTAL CENTER': (browser) => {

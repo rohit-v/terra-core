@@ -3,6 +3,13 @@ Changelog
 
 Unreleased
 ----------
+### Added
+* Added gainFocus and loseFocus actions to support trapping and releasing focus in the modal manager.
+
+1.2.0 - (July 26, 2017)
+------------------
+### Changed
+* Updated spacing around react-docgen comments
 
 1.1.0 - (July 18, 2017)
 ------------------

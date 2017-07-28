@@ -45,7 +45,7 @@
     "compile:heroku": "cd packages/terra-site && npm run compile:heroku",
     "danger": "danger",
     "deploy": "lerna run --scope terra-site deploy",
-    "heroku-prebuild": "npm install -g lerna@2.0.0-rc.4 && lerna init",
+    "heroku-prebuild": "npm install rimraf && npm install -g lerna@2.0.0-rc.4 && lerna init",
     "heroku-postbuild": "npm install --only=dev && npm run compile:heroku",
     "jest": "jest",
     "jest:coverage": "jest --coverage",
@@ -90,8 +90,8 @@
     "react-test-renderer": "^15.5.4",
     "rimraf": "^2.6.1",
     "shelljs": "^0.7.7",
-    "stylelint": "^7.12.0",
-    "stylelint-config-sass-guidelines": "^2.2.0",
+    "stylelint": "~8.0.0",
+    "stylelint-config-sass-guidelines": "^3.0.0",
     "stylelint-suitcss": "^1.0.0",
     "terra-toolkit": "^1.2.2"
   }

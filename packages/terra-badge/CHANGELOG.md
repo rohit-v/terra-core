@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ----------
 
+1.1.1 - (July 26, 2017)
+------------------
+### Changed
+* Use classnames/bind
+
 1.1.0 - (July 18, 2017)
 ------------------
 ### Changed

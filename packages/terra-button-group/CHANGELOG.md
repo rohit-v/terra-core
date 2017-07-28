@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ----------
 
+1.2.0 - (July 26, 2017)
+------------------
+### Changed
+* Converted component to use CSS modules
+* Updated spacing around react-docgen comments
+
 1.1.0 - (July 18, 2017)
 ------------------
 ### Added
