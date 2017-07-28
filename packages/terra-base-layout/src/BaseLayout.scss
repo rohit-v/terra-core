@@ -1,0 +1,20 @@
+body {
+  height: 100vh;
+  overflow: hidden;
+  width: 100vw;
+}
+
+:local {
+  /* stylelint-disable selector-class-pattern  */
+  .inner {
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    width: 100%;
+  }
+
+  .disable-overflow {
+    overflow: hidden;
+  }
+  /* stylelint-enable selector-class-pattern  */
+}

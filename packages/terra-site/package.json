@@ -38,6 +38,7 @@
     "terra-arrange": "^1.2.0",
     "terra-badge": "^1.1.1",
     "terra-base": "^1.1.0",
+    "terra-base-layout": "^0.x",
     "terra-button": "^1.1.0",
     "terra-button-group": "^1.2.0",
     "terra-content-container": "^1.1.0",

@@ -55,6 +55,7 @@ class App extends React.Component {
                 <List.Item content={<Link to="/site/app-delegate">App Delegate</Link>} />
                 <List.Item content={<Link to="/site/arrange">Arrange</Link>} />
                 <List.Item content={<Link to="/site/base">Base</Link>} />
+                <List.Item content={<Link to="/site/base-layout">Base Layout</Link>} />
                 <List.Item content={<Link to="/site/badge">Badge</Link>} />
                 <List.Item content={<Link to="/site/button">Button</Link>} />
                 <List.Item content={<Link to="/site/button-group">Button Group</Link>} />

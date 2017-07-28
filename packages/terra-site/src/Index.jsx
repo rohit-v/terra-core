@@ -10,6 +10,7 @@ import AppDelegateExamples from './examples/app-delegate/Index';
 import ArrangeExamples from './examples/arrange/Index';
 import BadgeExamples from './examples/badge/Index';
 import BaseExamples from './examples/base/Index';
+import BaseLayoutExamples from './examples/base-layout/Index';
 import ButtonExamples from './examples/button/Index';
 import ButtonGroupExamples from './examples/button-group/Index';
 import ContentContainerExamples from './examples/content-container/Index';
@@ -45,6 +46,7 @@ import AlertTestRoutes from 'terra-alert/tests/nightwatch/AlertTestRoutes';
 import ArrangeTestRoutes from 'terra-arrange/tests/nightwatch/ArrangeTestRoutes';
 import BadgeTestRoutes from 'terra-badge/tests/nightwatch/BadgeTestRoutes';
 import BaseTestRoutes from 'terra-base/tests/nightwatch/BaseTestRoutes';
+import BaseLayoutTestRoutes from 'terra-base/tests/nightwatch/BaseLayoutTestRoutes';
 import ButtonTestRoutes from 'terra-button/tests/nightwatch/ButtonTestRoutes';
 import ButtonGroupTestRoutes from 'terra-button-group/tests/nightwatch/ButtonGroupTestRoutes';
 import ContentContainerTestRoutes from 'terra-content-container/tests/nightwatch/ContentContainerTestRoutes';
@@ -91,6 +93,7 @@ ReactDOM.render((
       <Route path="arrange" component={ArrangeExamples} />
       <Route path="badge" component={BadgeExamples} />
       <Route path="base" component={BaseExamples} />
+      <Route path="base-layout" component={BaseLayoutExamples} />
       <Route path="button" component={ButtonExamples} />
       <Route path="button-group" component={ButtonGroupExamples} />
       <Route path="content-container" component={ContentContainerExamples} />
@@ -125,6 +128,7 @@ ReactDOM.render((
     {ArrangeTestRoutes}
     {BadgeTestRoutes}
     {BaseTestRoutes}
+    {BaseLayoutTestRoutes}
     {ButtonTestRoutes}
     {ButtonGroupTestRoutes}
     {DatePickerTestRoutes}
