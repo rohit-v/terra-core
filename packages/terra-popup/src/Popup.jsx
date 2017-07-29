@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Portal from 'react-portal';
+import Magic from 'terra-magic';
 import PopupContent from './_PopupContent';
 import PopupArrow from './_PopupArrow';
 import PopupOverlay from './_PopupOverlay';
-import TetherComponent from './_TetherComponent';
 import PopupUtils from './_PopupUtils';
 import PopupHeights from './_PopupHeights';
 import PopupWidths from './_PopupWidths';
@@ -42,7 +41,7 @@ const propTypes = {
   /**
    * Attachment point for the popup, this will be mirrored to the target.
    */
-  contentAttachment: PropTypes.oneOf(TetherComponent.attachmentPositions),
+  contentAttachment: PropTypes.oneOf(Magic.attachmentPositions),
   /**
    * A string representation of the height in px, limited to:
    * 40, 80, 120, 160, 240, 320, 400, 480, 560, 640, 720, 800, 880
@@ -84,7 +83,7 @@ class Popup extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleTetherRepositioned = this.handleTetherRepositioned.bind(this);
+    this.handleOnPosition = this.handleOnPosition.bind(this);
     this.setArrowNode = this.setArrowNode.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
   }
@@ -123,7 +122,7 @@ class Popup extends React.Component {
     this.contentNode = node;
   }
 
-  handleTetherRepositioned(event, targetBounds, contentBounds) {
+  handleOnPosition(event, targetBounds, contentBounds) {
     if (this.arrowNode && this.contentNode) {
       this.setArrowPosition(targetBounds, contentBounds);
     }
@@ -172,18 +171,6 @@ class Popup extends React.Component {
     );
   }
 
-  createPortalContent(content, useOverlay) {
-    if (!useOverlay) {
-      return content;
-    }
-
-    return (
-      <PopupOverlay className={this.props.classNameOverlay}>
-        {content}
-      </PopupOverlay>
-    );
-  }
-
   render() {
     /* eslint-disable no-unused-vars */
     const {
@@ -203,49 +190,35 @@ class Popup extends React.Component {
     } = this.props;
     /* eslint-enable no-unused-vars */
 
-    let portalContent = children;
+    let magicContent = children;
+    let bidiContentAttachment = contentAttachment;
+    this.isRTL = document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl';
+    if (this.isRTL) {
+      bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
+    }
+    this.offset = { vertical: 0, horizontal: 0 };
+    this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
+
     if (isOpen) {
-      let bidiContentAttachment = contentAttachment;
-      this.isRTL = document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl';
-      if (this.isRTL) {
-        bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
-      }
-
-      this.offset = { vertical: 0, horizontal: 0 };
-      this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
-
       const boundingFrame = boundingRef ? boundingRef() : undefined;
-      const popupContent = this.createPopupContent(boundingFrame);
-      const allowScrolling = false;
-      const constraints = [
-        {
-          to: (boundingFrame || 'window'),
-          attachment: 'together',
-          pin: true,
-        },
-      ];
-
-      const tetherCotent = (
-        <TetherComponent
-          classPrefix="terra-Popup"
-          constraints={constraints}
-          content={popupContent}
-          contentAttachment={bidiContentAttachment}
-          contentOffset={`${this.offset.vertical} ${this.offset.horizontal}`}
-          isEnabled
-          onRepositioned={this.handleTetherRepositioned}
-          targetRef={targetRef}
-          targetAttachment={PopupUtils.mirrorAttachment(bidiContentAttachment)}
-        />
-      );
-
-      portalContent = this.createPortalContent(tetherCotent, !allowScrolling);
+      magicContent = this.createPopupContent(boundingFrame);
     }
 
     return (
-      <Portal isOpened={isOpen}>
-        {portalContent}
-      </Portal>
+      <div>
+        {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
+        <Magic
+          boundingRef={boundingRef}
+          content={magicContent}
+          contentAttachment={bidiContentAttachment}
+          contentOffset={`${this.offset.vertical} ${this.offset.horizontal}`}
+          isEnabled
+          isOpen={isOpen}
+          onPosition={this.handleOnPosition}
+          targetRef={targetRef}
+          targetAttachment={PopupUtils.mirrorAttachment(bidiContentAttachment)}
+        />
+      </div>
     );
   }
 }

@@ -34,10 +34,10 @@
     "focus-trap-react": "^3.0.2",
     "prop-types": "^15.5.8",
     "react-onclickoutside": "^5.11.1",
-    "react-portal": "^3.0.0",
     "terra-base": "^1.1.0",
     "terra-content-container": "^1.1.0",
     "terra-icon": "^1.2.0",
+    "terra-magic": "^0.x",
     "tether": "^1.4.0"
   },
   "scripts": {

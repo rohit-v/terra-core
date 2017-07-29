@@ -24,7 +24,7 @@ const propTypes = {
   /**
    * The content to be magicked.
    */
-  content: PropTypes.element,
+  content: PropTypes.element.isRequired,
   /**
    * String pair seperated by a space using values of top, middle, bottom, and left, center, right.
    */
@@ -68,7 +68,6 @@ class Magic extends React.Component {
   constructor(props) {
     super(props);
     this.setContentNode = this.setContentNode.bind(this);
-    this.handleOnPosition = this.handleOnPosition.bind(this);
     this.getNodeRects = this.getNodeRects.bind(this);
   }
 
@@ -92,7 +91,7 @@ class Magic extends React.Component {
   getNodeRects() {
     const targetRect = MagicUtils.getBounds(this.props.targetRef());
     const contentRect = MagicUtils.getBounds(this.contentNode);
-    const boundingRect = MagicUtils.getBounds(this.props.boundingRef());
+    const boundingRect = MagicUtils.getBoundingRect(this.props.boundingRef ? this.props.boundingRef() : 'window');
     return { targetRect, contentRect, boundingRect };
   }
 
@@ -100,19 +99,18 @@ class Magic extends React.Component {
   //   // here add scroll, resize, etc events
   // }
 
-  handleOnPosition(event) {
-    if (this.props.onPosition) {
-      const bounds = this.getNodeBounds();
-      this.props.onPosition(event, bounds.targetBounds, bounds.contentBounds);
-    }
-  }
-
   position() {
-    const rects = this.getNodeRects();
+    let rects = this.getNodeRects();
     const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment);
     this.contentNode.style.position = style.position;
     this.contentNode.style.left = style.left;
     this.contentNode.style.top = style.top;
+    this.contentNode.style.transform = 'none';
+
+    if (this.props.onPosition) {
+      rects = this.getNodeRects();
+      this.props.onPosition(event, rects.targetRect, rects.contentRect);
+    }
   }
 
   destroy() {
@@ -149,9 +147,7 @@ class Magic extends React.Component {
 
     return (
       <Portal isOpened={isOpen}>
-        <MagicContent {...customProps} refCallback={this.setContentNode}>
-          {content}
-        </MagicContent>
+        <MagicContent {...customProps} content={content} refCallback={this.setContentNode} />
       </Portal>
     );
   }

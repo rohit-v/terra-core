@@ -3,7 +3,15 @@ const BOUNDS_FORMAT = ['left', 'top', 'right', 'bottom'];
 // Same as native getBoundingClientRect, except it takes into account parent <frame> offsets
 // if the element lies within a nested document (<frame> or <iframe>-like).
 const getActualBoundingClientRect = (node) => {
-  const rect = Object.assign({}, node.getBoundingClientRect());
+  const clientRect = node.getBoundingClientRect();
+  const rect = {
+    top: clientRect.top,
+    right: clientRect.right,
+    bottom: clientRect.bottom,
+    left: clientRect.left,
+    width: clientRect.width,
+    height: clientRect.height
+  };
 
   if (node.ownerDocument !== document) {
     const frameElement = node.ownerDocument.defaultView.frameElement;
@@ -100,35 +108,63 @@ const getBounds = (element) => {
 
 const getBoundingRect = (boundingElement) => {
   if (boundingElement === 'window') {
-    return [pageXOffset, pageYOffset, innerWidth + pageXOffset, innerHeight + pageYOffset];
+    // return {
+    //   top: pageYOffset,
+    //   bottom: innerHeight + pageYOffset,
+    //   left: pageXOffset,
+    //   right: innerWidth + pageXOffset,
+    // };
+    return {
+      top: 0,
+      bottom: innerHeight,
+      left: 0,
+      right: innerWidth,
+    };
   }
 
   const bounds = getBounds(boundingElement);
   const style = getComputedStyle(boundingElement);
-  const rect = [bounds.left, bounds.top, bounds.width + bounds.left, bounds.height + bounds.top];
+  const rect = {
+    top: bounds.top,
+    bottom: bounds.top + bounds.height,
+    left: bounds.left,
+    right: bounds.left + bounds.width,
+  };
 
   // Account any parent Frames scroll offset
   if (boundingElement.ownerDocument !== document) {
     const win = boundingElement.ownerDocument.defaultView;
-    rect[0] += win.pageXOffset;
-    rect[1] += win.pageYOffset;
-    rect[2] += win.pageXOffset;
-    rect[3] += win.pageYOffset;
+    rect['left'] += win.pageXOffset;
+    rect['top'] += win.pageYOffset;
+    rect['right'] += win.pageXOffset;
+    rect['bottom'] += win.pageYOffset;
   }
 
-  BOUNDS_FORMAT.forEach((side, i) => {
+  BOUNDS_FORMAT.forEach((side) => {
     const subSide = side[0].toUpperCase() + side.substr(1);
     if (subSide === 'Top' || subSide === 'Left') {
-      rect[i] += parseFloat(style[`border${subSide}Width`]);
+      rect[side] += parseFloat(style[`border${subSide}Width`]);
     } else {
-      rect[i] -= parseFloat(style[`border${subSide}Width`]);
+      rect[side] -= parseFloat(style[`border${subSide}Width`]);
     }
   });
 
   return rect;
 };
 
+const parseOffset = (value) => {
+  if (!value) {
+    return { vertical: 0, horizontal: 0 };
+  }
+
+  const pair = parseStringPair(value);
+  return { vertical: Number.parseFloat(pair.vertical), horizontal: Number.parseFloat(pair.horizontal) };
+};
+
 const parseStringPair = (value) => {
+  if (!value) {
+    return { vertical: '', horizontal: '' };
+  }
   const [vertical, horizontal] = value.split(' ');
   return { vertical, horizontal };
 };
@@ -159,23 +195,23 @@ const getInitialContentCoords = (rect, attachment, offset, targetCoords) => {
     if (attachment.horizontal === 'center') {
       attachmentCoords.x = targetCoords.x - (rect.width / 2);
     } else if (attachment.horizontal === 'right') {
-      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+      attachmentCoords.x = targetCoords.x - rect.width;
     } else {
       attachmentCoords.x = targetCoords.x;
     }
 
-    attachmentCoords.y = targetCoords.y + (rect.height / 2);
+    attachmentCoords.y = targetCoords.y - (rect.height / 2);
   } else {
     if (attachment.horizontal === 'center') {
       attachmentCoords.x = targetCoords.x - (rect.width / 2);
     } else if (attachment.horizontal === 'right') {
-      attachmentCoords.x = targetCoords.x + rect.width;
+      attachmentCoords.x = targetCoords.x - rect.width;
     } else {
       attachmentCoords.x = targetCoords.x;
     }
 
     if (attachment.vertical === 'bottom') {
-      attachmentCoords.y = targetCoords.y + rect.height;
+      attachmentCoords.y = targetCoords.y - rect.height;
     } else {
       attachmentCoords.y = targetCoords.y;
     }
@@ -186,18 +222,18 @@ const getInitialContentCoords = (rect, attachment, offset, targetCoords) => {
 
 const getAdjustContentCoords = (contentCoords, targetCoords, targetRect, contentRect, contentOffset, targetOffset, boundingRect) => {
   const attachmentCoords = {};
-  if (boundingRect.left <= contentCoords.x) {
+  if (boundingRect.left >= contentCoords.x) {
     attachmentCoords.x = boundingRect.left;
-  } else if (boundingRect.left + boundingRect.width >= contentCoords.x) {
-    attachmentCoords.x = (boundingRect.left + boundingRect.width) - contentRect.width;
+  } else if (boundingRect.right <= contentCoords.x + contentRect.width) {
+    attachmentCoords.x = boundingRect.right - contentRect.width;
   } else {
     attachmentCoords.x = contentCoords.x;
   }
 
-  if (boundingRect.top <= contentCoords.y) {
+  if (boundingRect.top >= contentCoords.y) {
     attachmentCoords.y = boundingRect.top;
-  } else if (boundingRect.top + boundingRect.height >= contentCoords.y) {
-    attachmentCoords.y = (boundingRect.top + boundingRect.height) - contentRect.height;
+  } else if (boundingRect.bottom <= contentCoords.y + contentRect.height) {
+    attachmentCoords.y = boundingRect.bottom - contentRect.height;
   } else {
     attachmentCoords.y = contentCoords.y;
   }
@@ -217,8 +253,8 @@ const getAdjustContentCoords = (contentCoords, targetCoords, targetRect, content
 const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment) => {
   const cAttachment = parseStringPair(contentAttachment);
   const tAttachment = parseStringPair(targetAttachment);
-  const cOffset = parseStringPair(contentOffset);
-  const tOffset = parseStringPair(targetOffset);
+  const cOffset = parseOffset(contentOffset);
+  const tOffset = parseOffset(targetOffset);
   const tCoords = getTargetCoords(targetRect, tAttachment, tOffset);
   const cCoords = getInitialContentCoords(contentRect, cAttachment, cOffset, tCoords);
   const cFinal = getAdjustContentCoords(cCoords, tCoords, targetRect, contentRect, cOffset, tOffset, boundingRect);
