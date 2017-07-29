@@ -69,14 +69,29 @@ class Magic extends React.Component {
     super(props);
     this.setContentNode = this.setContentNode.bind(this);
     this.getNodeRects = this.getNodeRects.bind(this);
+    this.update = this.update.bind(this);
+    this.state = { isEnabled: this.props.isEnabled };
+  }
+
+  componentWillReceiveProps(newProps) {    
+    if (newProps.isEnabled !== this.props.isEnabled) {
+      this.setState({ isEnabled: newProps });
+    }
   }
 
   componentDidMount() {
-    // this.addListeners();
+    if (this.state.isEnabled) {
+      this.enable();
+    }
     this.update();
   }
 
   componentDidUpdate() {
+    if (this.state.isEnabled) {
+      this.enable();
+    } else {
+      this.disable();
+    }
     this.update();
   }
 
@@ -95,11 +110,36 @@ class Magic extends React.Component {
     return { targetRect, contentRect, boundingRect };
   }
 
-  // addListeners() {
-  //   // here add scroll, resize, etc events
-  // }
+  enable() {
+    ['resize', 'scroll', 'touchmove'].forEach(event => {
+      window.addEventListener(event, this.update);
+    });
 
-  position() {
+    const target = this.props.targetRef();
+    this.scrollParents = MagicUtils.getScrollParents(this.props.targetRef());
+    this.scrollParents.forEach((parent) => {
+      if (parent !== target.ownerDocument) {
+        parent.addEventListener('scroll', this.update);
+      }
+    });
+  }
+
+  disable() {
+    ['resize', 'scroll', 'touchmove'].forEach(event => {
+      window.removeEventListener(event, this.update);
+    });
+
+    const target = this.props.targetRef();
+    if (this.scrollParents) {
+      this.scrollParents.forEach((parent) => {
+        if (parent !== target.ownerDocument) {
+          parent.removeEventListener('scroll', this.update);
+        }
+      });
+    }
+  }
+
+  position(event) {
     let rects = this.getNodeRects();
     const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment);
     this.contentNode.style.position = style.position;
@@ -114,20 +154,20 @@ class Magic extends React.Component {
   }
 
   destroy() {
-    // remove listeners here
+    this.disable();
     this.contentNode = null;
   }
 
-  update() {
+  update(event) {
     if (!this.props.targetRef() || !this.contentNode) {
       return;
     }
 
-    this.updateMagic();
+    this.updateMagic(event);
   }
 
-  updateMagic() {
-    this.position();
+  updateMagic(event) {
+    this.position(event);
   }
 
   render() {
