@@ -125,8 +125,62 @@ const getBoundingRect = (boundingElement) => {
   return rect;
 };
 
-const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment) => {
+// const MIRROR_LR = {
+//   center: 'center',
+//   left: 'right',
+//   right: 'left',
+// };
 
+// const MIRROR_TB = {
+//   middle: 'middle',
+//   top: 'bottom',
+//   bottom: 'top',
+// };
+
+const parseStringPair = (value) => {
+  const [vertical, horizontal] = value.split(' ');
+  return { vertical, horizontal };
+};
+
+// const isVerticalAttachment = attachment => (attachment.vertical !== 'middle');
+
+const attachmentCoords = (rect, attachment, offset) => {
+  const attachmentCoords;
+  if (attachment.vertical === 'middle') {
+    attachmentCoords.y = rect.top + (rect.height / 2);
+  } else if (attachment.vertical === 'bottom') {
+    attachmentCoords.y = rect.top + rect.height;
+  } else {
+    attachmentCoords.y = rect.top;
+  }
+
+  if (attachment.horizontal === 'center') {
+    attachmentCoords.x = rect.left + (rect.width / 2);
+  } else if (attachment.horizontal === 'right') {
+    attachmentCoords.x = rect.left + rect.width;
+  } else {
+    attachmentCoords.x = rect.left;
+  }
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical };
+}
+
+const adjustContentForRect = (targetCoords, contentRect, boundingRect, contentAttachment) => {
+  if () {
+
+  }
+  return { position: 'absolute', left: , top: };
+}
+
+const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment) => {
+  const cAttachment = parseStringPair(contentAttachment);
+  const tAttachment = parseStringPair(targetAttachment);
+  const cOffset = parseStringPair(contentOffset);
+  const tOffset = parseStringPair(targetOffset);
+  // const cCoords = attachmentCoords(targetRect, cAttachment, cOffset);
+  const tCoords = attachmentCoords(contentRect, tAttachment, tOffset);
+  const cFinal = adjustContentForRect(tCoords, contentRect, boundingRect, cAttachment);
+
+  return { position: cFinal.position, left: `${cFinal.left}px`, top: `${cFinal.top}px` };
 };
 
 export default {
