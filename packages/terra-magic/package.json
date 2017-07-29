@@ -1,7 +1,7 @@
 {
   "name": "terra-magic",
   "main": "lib/Magic.js",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "The Terra Magic componenet aims to provide it's own functioning positioning implementation.",
   "repository": {
     "type": "git",
@@ -26,8 +26,7 @@
   "peerDependencies": {
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "terra-base": "^1.1.0",
-    "terra-icon": "^1.2.0"
+    "terra-base": "^1.1.0"
   },
   "dependencies": {
     "classnames": "^2.2.5",

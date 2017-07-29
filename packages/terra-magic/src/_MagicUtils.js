@@ -3,12 +3,12 @@ const BOUNDS_FORMAT = ['left', 'top', 'right', 'bottom'];
 // Same as native getBoundingClientRect, except it takes into account parent <frame> offsets
 // if the element lies within a nested document (<frame> or <iframe>-like).
 const getActualBoundingClientRect = (node) => {
-  let rect = Object.assign({}, node.getBoundingClientRect());
+  const rect = Object.assign({}, node.getBoundingClientRect());
 
   if (node.ownerDocument !== document) {
-    let frameElement = node.ownerDocument.defaultView.frameElement;
+    const frameElement = node.ownerDocument.defaultView.frameElement;
     if (frameElement) {
-      let frameRect = getActualBoundingClientRect(frameElement);
+      const frameRect = getActualBoundingClientRect(frameElement);
       rect.top += frameRect.top;
       rect.bottom += frameRect.top;
       rect.left += frameRect.left;
@@ -24,57 +24,61 @@ const getScrollParents = (element) => {
   // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
   const computedStyle = getComputedStyle(element) || {};
   const position = computedStyle.position;
-  let parents = [];
+  const parents = [];
 
   if (position === 'fixed') {
     return [element];
   }
 
-  let parent = element;
-  while ((parent = parent.parentNode) && parent && parent.nodeType === 1) {
+  let parent = element.parentNode;
+  while (parent && parent.nodeType === 1) {
     let style;
     try {
       style = getComputedStyle(parent);
-    } catch (err) {}
+    } catch (err) {
+      style = null;
+    }
 
     if (typeof style === 'undefined' || style === null) {
       parents.push(parent);
       return parents;
     }
 
-    const {overflow, overflowX, overflowY} = style;
+    const { overflow, overflowX, overflowY } = style;
     if (/(auto|scroll|overlay)/.test(overflow + overflowY + overflowX)) {
       if (position !== 'absolute' || ['relative', 'absolute', 'fixed'].indexOf(style.position) >= 0) {
-        parents.push(parent)
+        parents.push(parent);
       }
     }
+    parent = parent.parentNode;
   }
 
   parents.push(element.ownerDocument.body);
 
   // If the node is within a frame, account for the parent window scroll
-  if (el.ownerDocument !== document) {
-    parents.push(el.ownerDocument.defaultView);
+  if (element.ownerDocument !== document) {
+    parents.push(element.ownerDocument.defaultView);
   }
 
   return parents;
 };
 
-const getBounds = (el) => {
+const getBounds = (element) => {
   let doc;
-  if (el === document) {
+  let currentElement = element;
+  if (element === document) {
     doc = document;
-    el = document.documentElement;
+    currentElement = document.documentElement;
   } else {
-    doc = el.ownerDocument;
+    doc = element.ownerDocument;
   }
 
   const docEl = doc.documentElement;
 
-  const box = getActualBoundingClientRect(el);
+  const box = getActualBoundingClientRect(currentElement);
 
   // const origin = getOrigin(); // decide if needed later
-  const origin = {top: 0, left: 0};
+  const origin = { top: 0, left: 0 };
 
   box.top -= origin.top;
   box.left -= origin.left;
@@ -86,8 +90,8 @@ const getBounds = (el) => {
     box.height = document.body.scrollHeight - box.top - box.bottom;
   }
 
-  box.top = box.top - docEl.clientTop;
-  box.left = box.left - docEl.clientLeft;
+  box.top -= docEl.clientTop;
+  box.left -= docEl.clientLeft;
   box.right = doc.body.clientWidth - box.width - box.left;
   box.bottom = doc.body.clientHeight - box.height - box.top;
 
@@ -95,18 +99,17 @@ const getBounds = (el) => {
 };
 
 const getBoundingRect = (boundingElement) => {
-  let rect;
   if (boundingElement === 'window') {
     return [pageXOffset, pageYOffset, innerWidth + pageXOffset, innerHeight + pageYOffset];
   }
 
   const bounds = getBounds(boundingElement);
   const style = getComputedStyle(boundingElement);
-  rect = [bounds.left, bounds.top, bounds.width + bounds.left, bounds.height + bounds.top];
+  const rect = [bounds.left, bounds.top, bounds.width + bounds.left, bounds.height + bounds.top];
 
   // Account any parent Frames scroll offset
   if (boundingElement.ownerDocument !== document) {
-    let win = to.ownerDocument.defaultView;
+    const win = boundingElement.ownerDocument.defaultView;
     rect[0] += win.pageXOffset;
     rect[1] += win.pageYOffset;
     rect[2] += win.pageXOffset;
@@ -114,38 +117,24 @@ const getBoundingRect = (boundingElement) => {
   }
 
   BOUNDS_FORMAT.forEach((side, i) => {
-    side = side[0].toUpperCase() + side.substr(1);
-    if (side === 'Top' || side === 'Left') {
-      rect[i] += parseFloat(style[`border${ side }Width`]);
+    const subSide = side[0].toUpperCase() + side.substr(1);
+    if (subSide === 'Top' || subSide === 'Left') {
+      rect[i] += parseFloat(style[`border${subSide}Width`]);
     } else {
-      rect[i] -= parseFloat(style[`border${ side }Width`]);
+      rect[i] -= parseFloat(style[`border${subSide}Width`]);
     }
   });
 
   return rect;
 };
 
-// const MIRROR_LR = {
-//   center: 'center',
-//   left: 'right',
-//   right: 'left',
-// };
-
-// const MIRROR_TB = {
-//   middle: 'middle',
-//   top: 'bottom',
-//   bottom: 'top',
-// };
-
 const parseStringPair = (value) => {
   const [vertical, horizontal] = value.split(' ');
   return { vertical, horizontal };
 };
 
-// const isVerticalAttachment = attachment => (attachment.vertical !== 'middle');
-
-const attachmentCoords = (rect, attachment, offset) => {
-  const attachmentCoords;
+const getTargetCoords = (rect, attachment, offset) => {
+  const attachmentCoords = {};
   if (attachment.vertical === 'middle') {
     attachmentCoords.y = rect.top + (rect.height / 2);
   } else if (attachment.vertical === 'bottom') {
@@ -162,25 +151,79 @@ const attachmentCoords = (rect, attachment, offset) => {
     attachmentCoords.x = rect.left;
   }
   return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical };
-}
+};
 
-const adjustContentForRect = (targetCoords, contentRect, boundingRect, contentAttachment) => {
-  if () {
+const getInitialContentCoords = (rect, attachment, offset, targetCoords) => {
+  const attachmentCoords = {};
+  if (attachment.vertical === 'middle') {
+    if (attachment.horizontal === 'center') {
+      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+    } else if (attachment.horizontal === 'right') {
+      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+    } else {
+      attachmentCoords.x = targetCoords.x;
+    }
 
+    attachmentCoords.y = targetCoords.y + (rect.height / 2);
+  } else {
+    if (attachment.horizontal === 'center') {
+      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+    } else if (attachment.horizontal === 'right') {
+      attachmentCoords.x = targetCoords.x + rect.width;
+    } else {
+      attachmentCoords.x = targetCoords.x;
+    }
+
+    if (attachment.vertical === 'bottom') {
+      attachmentCoords.y = targetCoords.y + rect.height;
+    } else {
+      attachmentCoords.y = targetCoords.y;
+    }
   }
-  return { position: 'absolute', left: , top: };
-}
+
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical };
+};
+
+const getAdjustContentCoords = (contentCoords, targetCoords, targetRect, contentRect, contentOffset, targetOffset, boundingRect) => {
+  const attachmentCoords = {};
+  if (boundingRect.left <= contentCoords.x) {
+    attachmentCoords.x = boundingRect.left;
+  } else if (boundingRect.left + boundingRect.width >= contentCoords.x) {
+    attachmentCoords.x = (boundingRect.left + boundingRect.width) - contentRect.width;
+  } else {
+    attachmentCoords.x = contentCoords.x;
+  }
+
+  if (boundingRect.top <= contentCoords.y) {
+    attachmentCoords.y = boundingRect.top;
+  } else if (boundingRect.top + boundingRect.height >= contentCoords.y) {
+    attachmentCoords.y = (boundingRect.top + boundingRect.height) - contentRect.height;
+  } else {
+    attachmentCoords.y = contentCoords.y;
+  }
+
+  // const validAttachments = ['top', 'bottom', 'left', 'right'];
+  // also need to determine adjust for offset
+  // const availableSpace = {
+  //   top: boundingRect.top - targetRect.top,
+  //   bottom: (boundingRect.top + boundingRect.height) - (targetRect.top + targetRect.height),
+  //   left: boundingRect.left - targetRect.left,
+  //   right: (boundingRect.left + boundingRect.width) - (targetRect.left + targetRect.width),
+  // };
+
+  return { x: attachmentCoords.x, y: attachmentCoords.y };
+};
 
 const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment) => {
   const cAttachment = parseStringPair(contentAttachment);
   const tAttachment = parseStringPair(targetAttachment);
   const cOffset = parseStringPair(contentOffset);
   const tOffset = parseStringPair(targetOffset);
-  // const cCoords = attachmentCoords(targetRect, cAttachment, cOffset);
-  const tCoords = attachmentCoords(contentRect, tAttachment, tOffset);
-  const cFinal = adjustContentForRect(tCoords, contentRect, boundingRect, cAttachment);
+  const tCoords = getTargetCoords(targetRect, tAttachment, tOffset);
+  const cCoords = getInitialContentCoords(contentRect, cAttachment, cOffset, tCoords);
+  const cFinal = getAdjustContentCoords(cCoords, tCoords, targetRect, contentRect, cOffset, tOffset, boundingRect);
 
-  return { position: cFinal.position, left: `${cFinal.left}px`, top: `${cFinal.top}px` };
+  return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px` };
 };
 
 export default {

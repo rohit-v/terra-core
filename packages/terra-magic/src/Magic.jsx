@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Portal from 'react-portal';
+import MagicContent from './_MagicContent';
 import MagicUtils from './_MagicUtils';
 
 const ATTACHMENT_POSITIONS = [
@@ -18,7 +20,7 @@ const propTypes = {
   /**
    * Reference to the bonding container, wil use window if nothing is provided.
    */
-  boundingRef: PropTypes.function,
+  boundingRef: PropTypes.func,
   /**
    * The content to be magicked.
    */
@@ -32,9 +34,13 @@ const propTypes = {
    */
   contentOffset: PropTypes.string,
   /**
-   * Should element be magicked to the page.
+   * Should element be actively magicked to the page.
    */
   isEnabled: PropTypes.bool,
+  /**
+   * Should element be presented.
+   */
+  isOpen: PropTypes.bool,
   /**
    * Required element to be presented and magicked to.
    */
@@ -63,10 +69,11 @@ class Magic extends React.Component {
     super(props);
     this.setContentNode = this.setContentNode.bind(this);
     this.handleOnPosition = this.handleOnPosition.bind(this);
+    this.getNodeRects = this.getNodeRects.bind(this);
   }
 
   componentDidMount() {
-    this.addListeners();
+    // this.addListeners();
     this.update();
   }
 
@@ -82,16 +89,16 @@ class Magic extends React.Component {
     this.contentNode = node;
   }
 
-  getNodeBounds() {
-    if (this.props.boundingRef) {
-
-    }
-
-    const targetBounds = MagicUtils.getBounds(this.props.targetRef());
-    const contentBounds = MagicUtils.getBounds(this.contentNode);
-    const boundingBounds = MagicUtils.getBounds(this.contentNode);
-    return { targetBounds, contentBounds, boundingBounds };
+  getNodeRects() {
+    const targetRect = MagicUtils.getBounds(this.props.targetRef());
+    const contentRect = MagicUtils.getBounds(this.contentNode);
+    const boundingRect = MagicUtils.getBounds(this.props.boundingRef());
+    return { targetRect, contentRect, boundingRect };
   }
+
+  // addListeners() {
+  //   // here add scroll, resize, etc events
+  // }
 
   handleOnPosition(event) {
     if (this.props.onPosition) {
@@ -101,7 +108,11 @@ class Magic extends React.Component {
   }
 
   position() {
-    // do stuff here
+    const rects = this.getNodeRects();
+    const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment);
+    this.contentNode.style.position = style.position;
+    this.contentNode.style.left = style.left;
+    this.contentNode.style.top = style.top;
   }
 
   destroy() {
@@ -128,6 +139,7 @@ class Magic extends React.Component {
       contentAttachment,
       contentOffset,
       isEnabled,
+      isOpen,
       targetRef,
       targetAttachment,
       targetOffset,
@@ -135,13 +147,12 @@ class Magic extends React.Component {
       ...customProps
     } = this.props;
 
-    // Delete the closePortal prop that comes from react-portal.
-    delete customProps.closePortal;
-
     return (
-      <div {...customProps} ref={this.setContentNode}>
-        {content}
-      </div>
+      <Portal isOpened={isOpen}>
+        <MagicContent {...customProps} refCallback={this.setContentNode}>
+          {content}
+        </MagicContent>
+      </Portal>
     );
   }
 }
