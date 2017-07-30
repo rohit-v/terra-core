@@ -259,7 +259,11 @@ const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentO
   const cCoords = getInitialContentCoords(contentRect, cAttachment, cOffset, tCoords);
   const cFinal = getAdjustContentCoords(cCoords, tCoords, targetRect, contentRect, cOffset, tOffset, boundingRect);
 
-  return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px` };
+  // Account for mobile zoom, this plays havoc with page offsets, so adjusting to fixed positioning.
+  if (document.body.clientWidth / window.innerWidth > 1.0) {
+    return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px` };
+  }
+  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px` };
 };
 
 export default {
