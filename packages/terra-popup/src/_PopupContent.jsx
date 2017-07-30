@@ -77,10 +77,6 @@ const propTypes = {
    */
   arrow: PropTypes.element,
   /**
-   * The initial arrow position.
-   */
-  arrowPosition: PropTypes.oneOf(ARROW_POSITIONS),
-  /**
    * CSS classnames that are appended to the popup content body.
    */
   classNameInner: PropTypes.string,

@@ -123,7 +123,7 @@ class Popup extends React.Component {
     }
   }
 
-  createPopupContent(boundingFrame) {
+  createPopupContent(boundingFrame, showArrow) {
     const boundsProps = {
       contentWidth: PopupWidths[this.props.contentWidth],
       contentHeight: PopupHeights[this.props.contentHeight],
@@ -138,18 +138,15 @@ class Popup extends React.Component {
     }
 
     let arrow;
-    let arrowPosition;
-    if (this.props.isArrowDisplayed && this.props.contentAttachment !== 'middle center') {
+    if (showArrow) {
       this.offset = PopupUtils.getContentOffset(this.attachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
       arrow = <PopupArrow className={this.props.classNameArrow} refCallback={this.setArrowNode} />;
-      arrowPosition = PopupUtils.primaryArrowPosition(this.attachment);
     }
 
     return (
       <PopupContent
         {...boundsProps}
         arrow={arrow}
-        arrowPosition={arrowPosition}
         classNameInner={this.props.classNameContent}
         closeOnEsc
         closeOnOutsideClick
@@ -181,26 +178,26 @@ class Popup extends React.Component {
       targetRef,
     } = this.props;
     /* eslint-enable no-unused-vars */
-
-    let magicContent = children;
+    this.offset = { vertical: 0, horizontal: 0 };
+    
     let bidiContentAttachment = contentAttachment;
-    this.isRTL = document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl';
-    if (this.isRTL) {
+    if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
       bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
     }
-    this.offset = { vertical: 0, horizontal: 0 };
     this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
 
+    let magicContent = children;
+    const showArrow = isArrowDisplayed && this.attachment !== 'middle center';
     if (isOpen) {
       const boundingFrame = boundingRef ? boundingRef() : undefined;
-      magicContent = this.createPopupContent(boundingFrame);
+      magicContent = this.createPopupContent(boundingFrame, showArrow);
     }
 
     return (
       <div>
         {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
         <Magic
-          arrowDepth={PopupContent.Opts.popupMargin}
+          arrowDepth={showArrow ? PopupContent.Opts.popupMargin : 0}
           boundingRef={boundingRef}
           content={magicContent}
           contentAttachment={bidiContentAttachment}
