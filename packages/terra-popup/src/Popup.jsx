@@ -89,27 +89,22 @@ class Popup extends React.Component {
   }
 
   setArrowPosition(targetBounds, contentBounds) {
-    const isVertical = PopupUtils.isVerticalAttachment(this.attachment);
-    const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, isVertical, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
+    const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
 
-    this.contentNode.style.margin = '';
+    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.top);
+    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.bottom);
+    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.left);
+    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.right);
     if (!position) {
-      this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.top);
-      this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.bottom);
-      this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.left);
-      this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.right);
       return;
     }
-
-    this.arrowNode.removeAttribute(PopupArrow.Opts.mirroredPositionAttrs[position]);
-    this.contentNode.removeAttribute(PopupContent.Opts.mirroredPositionAttrs[position]);
-
     this.arrowNode.setAttribute(PopupArrow.Opts.positionAttrs[position], 'true');
-    this.contentNode.setAttribute(PopupContent.Opts.positionAttrs[position], 'true');
 
-    if (isVertical) {
+    if (position === 'top' || position === 'bottom') {
       this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, this.offset, this.attachment);
+      this.arrowNode.style.top = '';
     } else {
+      this.arrowNode.style.left = '';
       this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
     }
   }
@@ -144,12 +139,10 @@ class Popup extends React.Component {
 
     let arrow;
     let arrowPosition;
-    let contentStyle;
     if (this.props.isArrowDisplayed && this.props.contentAttachment !== 'middle center') {
       this.offset = PopupUtils.getContentOffset(this.attachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
       arrow = <PopupArrow className={this.props.classNameArrow} refCallback={this.setArrowNode} />;
       arrowPosition = PopupUtils.primaryArrowPosition(this.attachment);
-      contentStyle = PopupUtils.primaryMarginStyle(this.attachment, PopupContent.Opts.popupMargin);
     }
 
     return (
@@ -164,7 +157,6 @@ class Popup extends React.Component {
         isHeaderDisabled={this.props.isHeaderDisabled}
         onRequestClose={this.props.onRequestClose}
         refCallback={this.setContentNode}
-        style={contentStyle}
       >
         {this.props.children}
       </PopupContent>
@@ -208,6 +200,7 @@ class Popup extends React.Component {
       <div>
         {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
         <Magic
+          arrowDepth={PopupContent.Opts.popupMargin}
           boundingRef={boundingRef}
           content={magicContent}
           contentAttachment={bidiContentAttachment}

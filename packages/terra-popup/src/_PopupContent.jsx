@@ -126,7 +126,7 @@ const defaultProps = {
 };
 
 class PopupContent extends React.Component {
-  static getContentStyle(arrow, arrowPosition, height, maxHeight, width, maxWidth) {
+  static getContentStyle(height, maxHeight, width, maxWidth) {
     const validHeight = maxHeight <= 0 || height <= maxHeight ? height : maxHeight;
     const validWidth = maxWidth <= 0 || width <= maxWidth ? width : maxWidth;
     return { height: `${validHeight.toString()}px`, width: `${validWidth.toString()}px` };
@@ -144,23 +144,6 @@ class PopupContent extends React.Component {
       return false;
     }
     return height >= maxHeight && width >= maxWidth;
-  }
-
-  static isMarginValid(dimension, dimensionMax) {
-    if (dimensionMax <= 0) {
-      return true;
-    }
-    return dimensionMax >= dimension + POPUP_MARGIN;
-  }
-
-  static shouldShowArrow(arrow, arrowPosition, contentHeight, contentHeightMax, contentWidth, contentWidthMax) {
-    if (arrow) {
-      if (['top', 'bottom'].indexOf(arrowPosition) >= 0) {
-        return PopupContent.isMarginValid(contentHeight, contentHeightMax);
-      }
-      return PopupContent.isMarginValid(contentWidth, contentWidthMax);
-    }
-    return false;
   }
 
   constructor(props) {
@@ -238,8 +221,7 @@ class PopupContent extends React.Component {
       ...customProps
     } = this.props;
 
-    const showArrow = PopupContent.shouldShowArrow(arrow, arrowPosition, contentHeight, contentHeightMax, contentWidth, contentWidthMax);
-    const contentStyle = PopupContent.getContentStyle(arrow, arrowPosition, contentHeight, contentHeightMax, contentWidth, contentWidthMax);
+    const contentStyle = PopupContent.getContentStyle(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
     const isFullScreen = PopupContent.isFullScreen(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
 
     let content = children;
@@ -247,12 +229,8 @@ class PopupContent extends React.Component {
       content = PopupContent.addPopupHeader(children, onRequestClose);
     }
 
-    let arrowContent;
-    if (showArrow) {
-      arrowContent = arrow;
-    }
-
     const roundedCorners = arrow && !isFullScreen;
+    const arrowContent = roundedCorners ? arrow : undefined;
     const innerClassNames = cx([
       'inner',
       { isFullScreen },

@@ -18,6 +18,10 @@ const ATTACHMENT_POSITIONS = [
 
 const propTypes = {
   /**
+   * Depth in px of the margin to allow for an arrow.
+   */
+  arrowDepth: PropTypes.number,
+  /**
    * Reference to the bonding container, wil use window if nothing is provided.
    */
   boundingRef: PropTypes.func,
@@ -141,7 +145,7 @@ class Magic extends React.Component {
 
   position(event) {
     let rects = this.getNodeRects();
-    const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment);
+    const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment, this.props.arrowDepth);
     this.contentNode.style.position = style.position;
     this.contentNode.style.left = style.left;
     this.contentNode.style.top = style.top;
@@ -172,6 +176,7 @@ class Magic extends React.Component {
 
   render() {
     const {
+      arrowDepth,
       boundingRef,
       content,
       contentAttachment,

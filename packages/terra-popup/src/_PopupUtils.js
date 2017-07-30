@@ -62,25 +62,42 @@ const getContentOffset = (attachment, targetNode, arrowOffset, cornerOffset) => 
   return offset;
 };
 
+const doesArrowFitHorizontal = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
+  return (contentBounds.left + contentBounds.width) - arrowOffset - cornerOffset >= targetBounds.left && contentBounds.left + arrowOffset + cornerOffset <= targetBounds.left + targetBounds.width;
+};
+
+const doesArrowFitVertical = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
+  return (contentBounds.top + contentBounds.height) - arrowOffset - cornerOffset >= targetBounds.top && contentBounds.top + arrowOffset + cornerOffset <= targetBounds.top + targetBounds.height;
+};
+
 /**
  * This method calculates the arrow position based on the content and targets relative position.
  */
-const arrowPositionFromBounds = (targetBounds, contentBounds, isVertical, arrowOffset, cornerOffset) => {
-  if (isVertical) {
-    if ((contentBounds.left + contentBounds.width) - arrowOffset - cornerOffset >= targetBounds.left && contentBounds.left + arrowOffset + cornerOffset <= targetBounds.left + targetBounds.width) {
-      if (targetBounds.top < contentBounds.top) {
-        return 'top';
-      } else if (targetBounds.bottom < contentBounds.bottom) {
-        return 'bottom';
-      }
+const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
+  if (contentBounds.top + contentBounds.height <= targetBounds.top) {
+    // fully above
+    if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+      return 'bottom';
     }
-  } else if ((contentBounds.top + contentBounds.height) - arrowOffset - cornerOffset >= targetBounds.top && contentBounds.top + arrowOffset + cornerOffset <= targetBounds.top + targetBounds.height) {
-    if (targetBounds.left < contentBounds.left) {
-      return 'left';
-    } else if (targetBounds.right < contentBounds.right) {
+  } else if (contentBounds.left + contentBounds.width <= targetBounds.left) {
+    // fully left
+    if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
       return 'right';
     }
+  } else if (contentBounds.top >= targetBounds.top + targetBounds.height) {
+    // fully below
+    if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+      return 'top';
+    }
+  } else if (contentBounds.left >= targetBounds.left + targetBounds.width) {
+    // fully right
+    if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+      return 'left';
+    }
+  } else {
+    // break the tie with a default attachment calculation
   }
+
   return undefined;
 };
 
