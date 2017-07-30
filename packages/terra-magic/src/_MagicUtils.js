@@ -21,7 +21,7 @@ const getActualBoundingClientRect = (node) => {
     bottom: clientRect.bottom,
     left: clientRect.left,
     width: clientRect.width,
-    height: clientRect.height
+    height: clientRect.height,
   };
 
   if (node.ownerDocument !== document) {
@@ -145,10 +145,10 @@ const getBoundingRect = (boundingElement) => {
   // Account any parent Frames scroll offset
   if (boundingElement.ownerDocument !== document) {
     const win = boundingElement.ownerDocument.defaultView;
-    rect['left'] += win.pageXOffset;
-    rect['top'] += win.pageYOffset;
-    rect['right'] += win.pageXOffset;
-    rect['bottom'] += win.pageYOffset;
+    rect.left += win.pageXOffset;
+    rect.top += win.pageYOffset;
+    rect.right += win.pageXOffset;
+    rect.bottom += win.pageYOffset;
   }
 
   BOUNDS_FORMAT.forEach((side) => {
@@ -163,6 +163,14 @@ const getBoundingRect = (boundingElement) => {
   return rect;
 };
 
+const parseStringPair = (value) => {
+  if (!value) {
+    return { vertical: '', horizontal: '' };
+  }
+  const [vertical, horizontal] = value.split(' ');
+  return { vertical, horizontal };
+};
+
 const parseOffset = (value) => {
   if (!value) {
     return { vertical: 0, horizontal: 0 };
@@ -170,14 +178,6 @@ const parseOffset = (value) => {
 
   const pair = parseStringPair(value);
   return { vertical: Number.parseFloat(pair.vertical), horizontal: Number.parseFloat(pair.horizontal) };
-};
-
-const parseStringPair = (value) => {
-  if (!value) {
-    return { vertical: '', horizontal: '' };
-  }
-  const [vertical, horizontal] = value.split(' ');
-  return { vertical, horizontal };
 };
 
 const getTargetCoords = (rect, attachment, offset) => {
@@ -232,18 +232,18 @@ const getBasicContentCoords = (rect, attachment, offset, targetCoords, arrowDept
 };
 
 const isValidCoords = (cAttachment, cCoords, cRect, bRect) => {
-  if (cAttachment.vertical === 'middle') { 
+  if (cAttachment.vertical === 'middle') {
     if (cAttachment.horizontal === 'right') {
       return cCoords.x + cRect.width <= bRect.right;
     } else if (cAttachment.horizontal === 'left') {
-      return cCoords.x >= bRect.left
+      return cCoords.x >= bRect.left;
     }
     return true;
   } else if (cAttachment.vertical === 'top') {
     return cCoords.y + cRect.height <= bRect.bottom;
   }
   return cCoords.y >= bRect.top;
-}
+};
 
 const mirrorAttachment = (attachment) => {
   const mAttachment = {};
@@ -261,22 +261,22 @@ const mirrorTargetCoords = (tRect, tAttachment, tOffset) => {
   const mOffset = { vertical: -tOffset.vertical, horizontal: -tOffset.horizontal };
   const mAttachment = mirrorAttachment(tAttachment);
   return getTargetCoords(tRect, mAttachment, mOffset);
-}
+};
 
 const rotateAttachment = (attachment, angle) => {
   const rAttachment = {};
   if (attachment.vertical === 'middle') {
     if (angle === '90') {
-      rAttachment.vertical = attachment.vertical === 'left' ? 'bottom' : 'top' ;
+      rAttachment.vertical = attachment.vertical === 'left' ? 'bottom' : 'top';
     } else if (angle === '-90') {
-      rAttachment.vertical = attachment.vertical === 'left' ? 'top' : 'bottom' ;
+      rAttachment.vertical = attachment.vertical === 'left' ? 'top' : 'bottom';
     }
     rAttachment.horizontal = 'center';
   } else {
     if (angle === '90') {
-      rAttachment.horizontal = attachment.vertical === 'top' ? 'left' : 'right' ;
+      rAttachment.horizontal = attachment.vertical === 'top' ? 'left' : 'right';
     } else if (angle === '-90') {
-      rAttachment.horizontal = attachment.vertical === 'top' ? 'right' : 'left' ;
+      rAttachment.horizontal = attachment.vertical === 'top' ? 'right' : 'left';
     }
     rAttachment.vertical = 'middle';
   }
@@ -287,7 +287,7 @@ const rotateTargetCoords = (tRect, tAttachment, angle) => {
   const noOffset = { vertical: 0, horizontal: 0 };
   const rAttachment = rotateAttachment(tAttachment, angle);
   return getTargetCoords(tRect, rAttachment, noOffset);
-}
+};
 
 const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cAttachment, cOffset, bRect, arrowDepth) => {
   if (isValidCoords(cAttachment, cCoords, cRect, bRect)) {
@@ -307,7 +307,7 @@ const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cA
   let rtCoords = rotateTargetCoords(tRect, tAttachment, '90');
   let rcAttachement = rotateAttachment(cAttachment, '90');
   let rcCoords = getBasicContentCoords(cRect, rcAttachement, noOffset, rtCoords, arrowDepth);
-  
+
   if (isValidCoords(rcAttachement, rcCoords, cRect, bRect)) {
     return rcCoords; // 90degree valid
   }

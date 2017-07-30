@@ -9,47 +9,11 @@ import styles from './PopupContent.scss';
 
 const cx = classNames.bind(styles);
 /**
- * Directional classes to be applied by a presenting component.
- */
-const CONTENT_ATTRS = {
-  top: 'data-arrow-top',
-  bottom: 'data-arrow-bottom',
-  left: 'data-arrow-left',
-  right: 'data-arrow-right',
-};
-
-/**
- * Mirrored directional classes, used to flip the arrow on repositioning.
- */
-const MIRRORED_CONTENT_ATTRS = {
-  top: 'data-arrow-bottom',
-  bottom: 'data-arrow-top',
-  left: 'data-arrow-right',
-  right: 'data-arrow-left',
-};
-
-/**
  * Key code value for the escape key.
  */
 const KEYCODES = {
   ESCAPE: 27,
 };
-
-/**
- * Valid positions for the arrow, applies a margin to the corresponding side.
- */
-const ARROW_POSITIONS = [
-  'top',
-  'bottom',
-  'left',
-  'right',
-];
-
-/**
- * Margin value used for calculations.
- */
-const POPUP_MARGIN = 10;
-
 /**
  * Rounded corner size to be used when calculating the arrow offset.
  */
@@ -111,7 +75,6 @@ const propTypes = {
 };
 
 const defaultProps = {
-  arrowPosition: 'top',
   classNameInner: null,
   closeOnEsc: false,
   closeOnOutsideClick: false,
@@ -201,7 +164,6 @@ class PopupContent extends React.Component {
   render() {
     const {
       arrow,
-      arrowPosition,
       children,
       classNameInner,
       closeOnEsc,
@@ -256,9 +218,6 @@ PopupContent.defaultProps = defaultProps;
 
 const onClickOutsideContent = onClickOutside(PopupContent);
 onClickOutsideContent.Opts = {
-  positionAttrs: CONTENT_ATTRS,
-  mirroredPositionAttrs: MIRRORED_CONTENT_ATTRS,
-  popupMargin: POPUP_MARGIN,
   cornerSize: CORNER_SIZE,
 };
 

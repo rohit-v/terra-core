@@ -77,17 +77,17 @@ class Magic extends React.Component {
     this.state = { isEnabled: this.props.isEnabled };
   }
 
-  componentWillReceiveProps(newProps) {    
-    if (newProps.isEnabled !== this.props.isEnabled) {
-      this.setState({ isEnabled: newProps });
-    }
-  }
-
   componentDidMount() {
     if (this.state.isEnabled) {
       this.enable();
     }
     this.update();
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.isEnabled !== this.props.isEnabled) {
+      this.setState({ isEnabled: newProps });
+    }
   }
 
   componentDidUpdate() {

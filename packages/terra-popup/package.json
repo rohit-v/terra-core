@@ -37,8 +37,7 @@
     "terra-base": "^1.1.0",
     "terra-content-container": "^1.1.0",
     "terra-icon": "^1.2.0",
-    "terra-magic": "^0.x",
-    "tether": "^1.4.0"
+    "terra-magic": "^0.x"
   },
   "scripts": {
     "compile": "npm run compile:clean && npm run compile:build",

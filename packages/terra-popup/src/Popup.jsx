@@ -90,15 +90,11 @@ class Popup extends React.Component {
 
   setArrowPosition(targetBounds, contentBounds) {
     const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
-
-    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.top);
-    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.bottom);
-    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.left);
-    this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttrs.right);
     if (!position) {
+      this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttr);
       return;
     }
-    this.arrowNode.setAttribute(PopupArrow.Opts.positionAttrs[position], 'true');
+    this.arrowNode.setAttribute(PopupArrow.Opts.positionAttr, position);
 
     if (position === 'top' || position === 'bottom') {
       this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, this.offset, this.attachment);
@@ -179,7 +175,7 @@ class Popup extends React.Component {
     } = this.props;
     /* eslint-enable no-unused-vars */
     this.offset = { vertical: 0, horizontal: 0 };
-    
+
     let bidiContentAttachment = contentAttachment;
     if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
       bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
@@ -197,7 +193,7 @@ class Popup extends React.Component {
       <div>
         {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
         <Magic
-          arrowDepth={showArrow ? PopupContent.Opts.popupMargin : 0}
+          arrowDepth={showArrow ? PopupArrow.Opts.arrowMargin : 0}
           boundingRef={boundingRef}
           content={magicContent}
           contentAttachment={bidiContentAttachment}

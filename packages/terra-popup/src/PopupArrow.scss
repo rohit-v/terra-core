@@ -25,7 +25,7 @@
       }
     }
 
-    .popupArrow[data-align-top='true'] {
+    .popupArrow[data-align-arrow='top'] {
       border-bottom-color: var(--terra-popup-arrow-color);
       border-top-width: 0;
       display: block;
@@ -40,7 +40,7 @@
       }
     }
 
-    .popupArrow[data-align-bottom='true'] {
+    .popupArrow[data-align-arrow='bottom'] {
       border-bottom-width: 0;
       border-top-color: var(--terra-popup-arrow-color);
       display: block;
@@ -55,7 +55,7 @@
       }
     }
 
-    .popupArrow[data-align-left='true'] {
+    .popupArrow[data-align-arrow='left'] {
       border-left-width: 0;
       border-right-color: var(--terra-popup-arrow-color);
       display: block;
@@ -70,7 +70,7 @@
       }
     }
 
-    .popupArrow[data-align-right='true'] {
+    .popupArrow[data-align-arrow='right'] {
       border-left-color: var(--terra-popup-arrow-color);
       border-right-width: 0;
       display: block;

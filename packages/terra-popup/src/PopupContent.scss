@@ -50,22 +50,6 @@
     .isFullScreen {
       box-shadow: none;
     }
-
-    .popupContent[data-arrow-top='true'] {
-      margin-top: var(--terra-popup-content-margin);
-    }
-
-    .popupContent[data-arrow-bottom='true'] {
-      margin-bottom: var(--terra-popup-content-margin);
-    }
-
-    .popupContent[data-arrow-left='true'] {
-      margin-left: var(--terra-popup-content-margin);
-    }
-
-    .popupContent[data-arrow-right='true'] {
-      margin-right: var(--terra-popup-content-margin);
-    }
   }
   /* stylelint-enable */
 }
