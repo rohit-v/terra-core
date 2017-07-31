@@ -115,9 +115,7 @@ class Magic extends React.Component {
   }
 
   enable() {
-    ['resize', 'scroll', 'touchmove'].forEach(event => {
-      window.addEventListener(event, this.update);
-    });
+    ['resize', 'scroll', 'touchmove'].forEach(event => window.addEventListener(event, this.update));
 
     const target = this.props.targetRef();
     this.scrollParents = MagicUtils.getScrollParents(this.props.targetRef());
@@ -129,9 +127,7 @@ class Magic extends React.Component {
   }
 
   disable() {
-    ['resize', 'scroll', 'touchmove'].forEach(event => {
-      window.removeEventListener(event, this.update);
-    });
+    ['resize', 'scroll', 'touchmove'].forEach(event => window.removeEventListener(event, this.update));
 
     const target = this.props.targetRef();
     if (this.scrollParents) {

@@ -62,13 +62,9 @@ const getContentOffset = (attachment, targetNode, arrowOffset, cornerOffset) => 
   return offset;
 };
 
-const doesArrowFitHorizontal = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
-  return (contentBounds.left + contentBounds.width) - arrowOffset - cornerOffset >= targetBounds.left && contentBounds.left + arrowOffset + cornerOffset <= targetBounds.left + targetBounds.width;
-};
+const doesArrowFitHorizontal = (targetBounds, contentBounds, arrowOffset, cornerOffset) => (contentBounds.left + contentBounds.width) - arrowOffset - cornerOffset >= targetBounds.left && contentBounds.left + arrowOffset + cornerOffset <= targetBounds.left + targetBounds.width;
 
-const doesArrowFitVertical = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
-  return (contentBounds.top + contentBounds.height) - arrowOffset - cornerOffset >= targetBounds.top && contentBounds.top + arrowOffset + cornerOffset <= targetBounds.top + targetBounds.height;
-};
+const doesArrowFitVertical = (targetBounds, contentBounds, arrowOffset, cornerOffset) => (contentBounds.top + contentBounds.height) - arrowOffset - cornerOffset >= targetBounds.top && contentBounds.top + arrowOffset + cornerOffset <= targetBounds.top + targetBounds.height;
 
 /**
  * This method calculates the arrow position based on the content and targets relative position.

@@ -16,12 +16,13 @@ const propTypes = {
 const MagicContent = ({
     content,
     refCallback,
+    ...customProps
   }) => {
-  // // Delete the closePortal prop that comes from react-portal.
-  // delete customProps.closePortal; // eslint-disable-line no-param-reassign
+  // Delete the closePortal prop that comes from react-portal.
+  delete customProps.closePortal; // eslint-disable-line no-param-reassign
 
   return (
-    <div className="terra-Magic-content" ref={refCallback}>
+    <div {...customProps} className="terra-Magic-content" ref={refCallback}>
       {content}
     </div>
   );
