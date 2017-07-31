@@ -36,24 +36,28 @@ class BasicMenu extends React.Component {
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
         >
-          <Menu.Item text="Default 1" key="1" />
-          <Menu.Item
-            text="Default 2"
-            key="2"
-            subMenuItems={[
-              <Menu.Item text="Default 2.1" key="2.1" />,
-              <Menu.Item text="Default 2.2" key="2.2" />,
-              <Menu.Item text="Default 2.3" key="2.3" />,
-            ]}
-          />
-          <Menu.Item text="Default 3" key="3" onClick={() => alert('Default 3')} />
-          <Menu.Item text="Default 4" key="4" />
-          <Menu.Item text="Default 5" key="5" />
-          <Menu.ItemGroup isSelectable onChange={this.handleRequestClose} key="6">
-            <Menu.Item text="Default 61" key="61" />
-            <Menu.Item text="Default 62" key="62" />
-            <Menu.Item text="Default 63" key="63" />
-          </Menu.ItemGroup>
+          <Menu.Item text="Default 1" key="1" isSelected isToggleItem />
+          <Menu.Section>
+            <Menu.Item
+              text="Default 2"
+              key="2"
+              subMenuItems={[
+                <Menu.Item text="Default 2.1" key="2.1" />,
+                <Menu.Item text="Default 2.2" key="2.2" />,
+                <Menu.Item text="Default 2.3" key="2.3" />,
+              ]}
+            />
+            <Menu.Item text="Default 3" key="3" onClick={() => alert('Default 3')} />
+            <Menu.Item text="Default 4" key="4" />
+          </Menu.Section>
+          <Menu.Section>
+            <Menu.Item text="Default 5" key="5" />
+            <Menu.ItemGroup isSelectable onChange={this.handleRequestClose} key="6">
+              <Menu.Item text="Default 61" key="61" />
+              <Menu.Item text="Default 62" key="62" />
+              <Menu.Item text="Default 63" key="63" />
+            </Menu.ItemGroup>
+          </Menu.Section>
         </Menu>
         <Button onClick={this.handleButtonClick} text="Example Button Text" />
       </div>

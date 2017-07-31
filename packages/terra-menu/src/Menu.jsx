@@ -6,6 +6,7 @@ import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
 import SubMenu from './_SubMenu';
 import MenuNavStack from './_MenuNavStack';
+import MenuSection from './MenuSection';
 
 const propTypes = {
   /**
@@ -232,5 +233,6 @@ Menu.propTypes = propTypes;
 Menu.defaultProps = defaultProps;
 Menu.Item = MenuItem;
 Menu.ItemGroup = MenuItemGroup;
+Menu.Section = MenuSection;
 
 export default Menu;

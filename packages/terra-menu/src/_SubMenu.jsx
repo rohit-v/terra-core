@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SingleSelectList from 'terra-list/lib/SingleSelectList';
+import List from 'terra-list';
 import IconLeft from 'terra-icon/lib/icon/IconLeft';
 import ContentContainer from 'terra-content-container';
 import IconClose from 'terra-icon/lib/icon/IconClose';
@@ -24,9 +24,9 @@ const defaultProps = {
 
 const SubMenu = (props) => {
   const content = (
-    <SingleSelectList>
+    <List className={cx(['content'])}>
       {props.children}
-    </SingleSelectList>
+    </List>
   );
 
   let header;

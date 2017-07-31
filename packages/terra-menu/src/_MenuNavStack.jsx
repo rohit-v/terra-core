@@ -29,6 +29,9 @@ const propTypes = {
    */
   onRequestBack: PropTypes.func.isRequired,
 
+  /**
+   * List of menus to be placed in the stack.
+   */
   items: PropTypes.array,
 };
 

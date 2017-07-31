@@ -1,0 +1,23 @@
+/* stylelint-disable selector-class-pattern  */
+
+:local {
+  .divider {
+    border-color: #dedfe0;
+    border-style: solid;
+    border-width: 1px 0 0;
+    margin-top: 2px;
+
+    &::after {
+      border-color: lighten(#f9f9f9, 2%);
+      border-style: solid;
+      border-width: 3px 0 0;
+      margin-bottom: 4px;
+    }
+  }
+
+  .section + .section {
+    .divider {
+      display: none;
+    }
+  }
+}
