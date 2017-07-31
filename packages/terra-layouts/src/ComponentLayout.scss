@@ -1,0 +1,16 @@
+// Styles specific to development only
+// stylelint-disable
+:local {
+  .terra-AppLayout {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  #terra-component-root {
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    width: 100%;
+  }
+}
