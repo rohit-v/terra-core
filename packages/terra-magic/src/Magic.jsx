@@ -118,7 +118,7 @@ class Magic extends React.Component {
     ['resize', 'scroll', 'touchmove'].forEach(event => window.addEventListener(event, this.update));
 
     const target = this.props.targetRef();
-    this.scrollParents = MagicUtils.getScrollParents(this.props.targetRef());
+    this.scrollParents = MagicUtils.getScrollParents(target);
     this.scrollParents.forEach((parent) => {
       if (parent !== target.ownerDocument) {
         parent.addEventListener('scroll', this.update);
