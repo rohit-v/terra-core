@@ -69,7 +69,7 @@ const doesArrowFitVertical = (targetBounds, contentBounds, arrowOffset, cornerOf
 /**
  * This method calculates the arrow position based on the content and targets relative position.
  */
-const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
+const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, cornerOffset, attachment) => {
   if (contentBounds.top + contentBounds.height <= targetBounds.top) {
     // fully above
     if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
@@ -91,7 +91,41 @@ const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, corne
       return 'left';
     }
   } else {
+    const overlaps = [];
     // break the tie with a default attachment calculation
+    if (contentBounds.left + contentBounds.width > targetBounds.left && contentBounds.left + contentBounds.width < (targetBounds.left + targetBounds.width) - arrowOffset) {
+      if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+        overlaps.push('right');
+      }
+    }
+    if (contentBounds.top + contentBounds.height > targetBounds.top && contentBounds.top + contentBounds.height < (targetBounds.top + targetBounds.height) - arrowOffset) {
+      if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+        overlaps.push('bottom');
+      }
+    }
+    if (contentBounds.left > targetBounds.left + arrowOffset && contentBounds.left < targetBounds.left + targetBounds.width) {
+      if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+        overlaps.push('left');
+      }
+    }
+    if (contentBounds.top > targetBounds.top + arrowOffset && contentBounds.top < targetBounds.top + targetBounds.height) {
+      if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+        overlaps.push('top');
+      }
+    }
+
+    if (overlaps.length === 1) {
+      return overlaps[0];
+    } else if (overlaps.length >= 2) {
+      if (attachment.vertical === 'middle' && overlaps.indexOf(attachment.horizontal) >= 0) {
+        // check for left or right
+        return attachment.horizontal;
+      } else if (overlaps.indexOf(attachment.vertical) >= 0) {
+        // check for top or bottom
+        return attachment.vertical;
+      }
+      return overlaps[0];
+    }
   }
 
   return undefined;

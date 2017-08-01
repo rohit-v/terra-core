@@ -65,7 +65,7 @@ const propTypes = {
 
 const defaultProps = {
   isEnabled: false,
-  disableOnPosition: false,
+  isOpen: false,
 };
 
 class Magic extends React.Component {
@@ -149,7 +149,7 @@ class Magic extends React.Component {
 
     if (this.props.onPosition) {
       rects = this.getNodeRects();
-      this.props.onPosition(event, rects.targetRect, rects.contentRect);
+      this.props.onPosition(event, rects.targetRect, rects.contentRect, style.attachment, style.offset);
     }
   }
 
