@@ -16,6 +16,7 @@ const propTypes = {
   onBack: PropTypes.func,
   onClose: PropTypes.func,
   children: PropTypes.node,
+  className: PropTypes.string,
 };
 
 const defaultProps = {
@@ -60,7 +61,7 @@ const SubMenu = (props) => {
   }
 
   return (
-    <ContentContainer header={header} fill>
+    <ContentContainer header={header} fill className={cx([props.className])}>
       {content}
     </ContentContainer>
   );

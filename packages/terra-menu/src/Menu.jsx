@@ -1,12 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'terra-popup';
+import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
+import MenuDivider from './MenuDivider';
 import SubMenu from './_SubMenu';
 import MenuNavStack from './_MenuNavStack';
-import MenuSection from './MenuSection';
+import MenuWidths from './_MenuWidths';
+import styles from './Menu.scss';
+
+const cx = classNames.bind(styles);
 
 const propTypes = {
   /**
@@ -41,12 +46,29 @@ const propTypes = {
    * Should the menu be presented as open.
    */
   isOpen: PropTypes.bool,
+  /**
+   * A string representation of the width in px, limited to:
+   * 160, 240, 320, 640, 960, 1280, 1760
+   */
+  contentWidth: PropTypes.oneOf(Object.keys(MenuWidths)),
+
+  /**
+   * Indicates if the menu should have an center aligned arrow displayed on dropdown.
+   * Otherwise, the menu will display without an arrow and right aligned.
+   */
+  isArrowDisplayed: PropTypes.bool,
 };
 
 const defaultProps = {
+  isArrowDisplayed: false,
   children: [],
   isOpen: false,
 };
+
+const MENU_PADDING_TOP = 6;
+const MENU_PADDING_BOTTOM = 6;
+const MENU_ITEM_HEIGHT = 23;
+const MENU_DIVIDER_HEIGHT = 10;
 
 class Menu extends React.Component {
   static getPopupHeight(contentHeight) {
@@ -79,9 +101,9 @@ class Menu extends React.Component {
     return 880;
   }
 
-  static getBoundsProps(boundingFrame, popupHeight) {
+  static getBoundsProps(boundingFrame, popupHeight, popupWidth) {
     const boundsProps = {
-      contentWidth: 240,
+      contentWidth: popupWidth,
       contentHeight: popupHeight,
     };
 
@@ -130,18 +152,21 @@ class Menu extends React.Component {
   }
 
   getContentHeight() {
-    let contentCount = 0;
+    let itemCount = 0;
+    let dividerCount = 0;
 
     for (let i = 0; i < this.props.children.length; i += 1) {
       const child = this.props.children[i];
       if (child.props.children && child.props.children.length > 0) {
-        contentCount += child.props.children.length;
+        itemCount += child.props.children.length;
+      } else if (child.type === <MenuDivider />.type) {
+        dividerCount += 1;
       } else {
-        contentCount += 1;
+        itemCount += 1;
       }
     }
 
-    return contentCount * 34;
+    return (itemCount * MENU_ITEM_HEIGHT) + (dividerCount * MENU_DIVIDER_HEIGHT) + MENU_PADDING_TOP + MENU_PADDING_BOTTOM;
   }
 
 
@@ -151,7 +176,11 @@ class Menu extends React.Component {
 
   handleItemSelection(event, item) {
     const index = this.state.stack.length;
-    this.push(<SubMenu key={`MenuPage-${index}`} title={item.props.text}>{item.props.subMenuItems}</SubMenu>);
+    this.push((
+      <SubMenu key={`MenuPage-${index}`} title={item.props.text} className={cx(['submenu'])}>
+        {item.props.subMenuItems}
+      </SubMenu>
+    ));
   }
 
   wrapOnClick(item) {
@@ -198,6 +227,8 @@ class Menu extends React.Component {
       isOpen,
       children,
       targetRef,
+      isArrowDisplayed,
+      contentWidth,
       ...customProps
     } = this.props;
     const attributes = Object.assign({}, customProps);
@@ -205,16 +236,15 @@ class Menu extends React.Component {
 
     const contentHeight = this.getContentHeight();
     const popupHeight = Menu.getPopupHeight(contentHeight);
-    const boundsProps = Menu.getBoundsProps(boundingFrame, popupHeight);
+    const boundsProps = Menu.getBoundsProps(boundingFrame, popupHeight, MenuWidths[contentWidth]);
 
     return (
       <Popup
         {...attributes}
         boundingRef={boundingRef}
-        isArrowDisplayed
-        contentAttachment="bottom center"
+        isArrowDisplayed={isArrowDisplayed}
+        contentAttachment={isArrowDisplayed ? 'bottom center' : 'bottom right'}
         contentHeight={popupHeight.toString()}
-        contentWidth="240"
         classNameArrow={classNameArrow}
         classNameContent={classNameContent}
         classNameOverlay={classNameOverlay}
@@ -233,6 +263,6 @@ Menu.propTypes = propTypes;
 Menu.defaultProps = defaultProps;
 Menu.Item = MenuItem;
 Menu.ItemGroup = MenuItemGroup;
-Menu.Section = MenuSection;
+Menu.Divider = MenuDivider;
 
 export default Menu;

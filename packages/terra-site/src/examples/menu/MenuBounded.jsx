@@ -51,6 +51,7 @@ class MenuBounded extends React.Component {
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
+          contentWidth="240"
         >
           <Menu.Item text="Default 1" key="1" />
           <Menu.Item

@@ -14,6 +14,10 @@ const KEYCODES = {
   SPACE: 32,
 };
 
+const contextTypes = {
+  isGroupItem: PropTypes.bool,
+};
+
 const propTypes = {
   /**
    * Sets the item's text
@@ -28,7 +32,7 @@ const propTypes = {
   /**
    * Indicates if the item should be toggle-able
   */
-  isToggleItem: PropTypes.bool,
+  isSelectable: PropTypes.bool,
 
   /**
    * List of Menu.Items to display in a submenu when this item is selected.
@@ -43,7 +47,7 @@ const propTypes = {
 const defaultProps = {
   text: '',
   isSelected: false,
-  isToggleItem: false,
+  isSelectable: undefined,
   subMenuItems: [],
 };
 
@@ -83,33 +87,37 @@ class MenuItem extends React.Component {
     const {
       text,
       isSelected,
-      isToggleItem,
+      isSelectable,
       subMenuItems,
       ...customProps
     } = this.props;
 
+    const { isGroupItem } = this.context;
+
     const attributes = Object.assign({}, customProps);
     attributes.tabIndex = '0';
+    // This is passed down by the single select list in group item and not needed
+    delete attributes.hasChevron;
 
-    if (isToggleItem) {
+    if (isSelectable && !isGroupItem) {
       attributes.onClick = this.wrapOnClick;
-      attributes.onKeyDown = this.onKeyDown;
+      attributes.onKeyDown = this.wrapOnKeyDown;
     }
 
     const itemClassNames = cx([
       'item',
-      { selected: this.state.isSelected },
+      { selected: this.state.isSelected || (isGroupItem && isSelected) },
       attributes.className,
     ]);
 
-    const hasChevron = subMenuItems.length > 0;
     const content = <div className={cx(['title'])}>{text}</div>;
+    const hasChevron = subMenuItems.length > 0;
 
-    if (hasChevron || isToggleItem) {
+    if (hasChevron || isSelectable) {
       return (
         <li {...attributes} className={itemClassNames}>
           <Arrange
-            fitStart={isToggleItem || isSelected ? <CheckIcon className={cx(['checkmark'])} /> : null}
+            fitStart={isSelectable ? <CheckIcon className={cx(['checkmark'])} /> : null}
             fill={content}
             fitEnd={hasChevron ? <ChevronIcon className={cx(['chevron'])} /> : null}
             align={'center'}
@@ -128,5 +136,6 @@ class MenuItem extends React.Component {
 
 MenuItem.propTypes = propTypes;
 MenuItem.defaultProps = defaultProps;
+MenuItem.contextTypes = contextTypes;
 
 export default MenuItem;

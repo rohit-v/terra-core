@@ -2,7 +2,7 @@ import React from 'react';
 import Button from 'terra-button';
 import Menu from 'terra-menu';
 
-class BasicMenu extends React.Component {
+class ArrowMenu extends React.Component {
   constructor(props) {
     super(props);
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -36,6 +36,7 @@ class BasicMenu extends React.Component {
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
           contentWidth="240"
+          isArrowDisplayed
         >
           <Menu.Item text="Default 1" key="1" isSelected isSelectable />
           <Menu.Divider />
@@ -64,4 +65,4 @@ class BasicMenu extends React.Component {
   }
 }
 
-export default BasicMenu;
+export default ArrowMenu;
