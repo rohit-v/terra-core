@@ -16,6 +16,7 @@ const KEYCODES = {
 
 const contextTypes = {
   isGroupItem: PropTypes.bool,
+  isSelectableMenu: PropTypes.bool,
 };
 
 const propTypes = {
@@ -57,7 +58,7 @@ class MenuItem extends React.Component {
     this.wrapOnClick = this.wrapOnClick.bind(this);
     this.wrapOnKeyDown = this.wrapOnKeyDown.bind(this);
     this.handleSelection = this.handleSelection.bind(this);
-    this.state = { isSelected: props.isSelected };
+    this.state = { isSelected: props.isSelected && props.isSelectable };
   }
 
   handleSelection() {
@@ -92,7 +93,7 @@ class MenuItem extends React.Component {
       ...customProps
     } = this.props;
 
-    const { isGroupItem } = this.context;
+    const { isGroupItem, isSelectableMenu } = this.context;
 
     const attributes = Object.assign({}, customProps);
     attributes.tabIndex = '0';
@@ -113,11 +114,11 @@ class MenuItem extends React.Component {
     const content = <div className={cx(['title'])}>{text}</div>;
     const hasChevron = subMenuItems.length > 0;
 
-    if (hasChevron || isSelectable) {
+    if (hasChevron || isSelectableMenu) {
       return (
         <li {...attributes} className={itemClassNames}>
           <Arrange
-            fitStart={isSelectable ? <CheckIcon className={cx(['checkmark'])} /> : null}
+            fitStart={isSelectableMenu ? <CheckIcon className={cx(['checkmark'])} /> : null}
             fill={content}
             fitEnd={hasChevron ? <ChevronIcon className={cx(['chevron'])} /> : null}
             align={'center'}

@@ -1,63 +1,79 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SlideGroup from 'terra-slide-group';
+import MenuContent from './_MenuContent';
 
 const propTypes = {
-  /**
-   * A the px value of height to be applied to the content container.
-   */
-  contentHeight: PropTypes.number.isRequired,
-  /**
-   * The maximum height to set for popup content in px, also used with responsive behavior for actual height.
-   */
-  contentHeightMax: PropTypes.number,
-  /**
-   * A the px value of width to be applied to the content container.
-   */
-  contentWidth: PropTypes.number.isRequired,
-  /**
-   * The maximum width of the popup content in px, also used with responsive behavior for actual width.
-   */
-  contentWidthMax: PropTypes.number,
   /**
    * The function that should be triggered when a close is indicated.
    */
   onRequestClose: PropTypes.func.isRequired,
 
-  /**
-   * The function that should be triggered when a back is indicated.
-   */
-  onRequestBack: PropTypes.func.isRequired,
+  isFullScreen: PropTypes.bool,
+  isOpen: PropTypes.bool,
 
   /**
-   * List of menus to be placed in the stack.
+   * List off initial menu items.
    */
   items: PropTypes.array,
 };
 
 class MenuNavStack extends React.Component {
-  static isFullScreen(height, maxHeight, width, maxWidth) {
-    if (maxHeight <= 0 || maxWidth <= 0) {
-      return false;
-    }
-    return height >= maxHeight && width >= maxWidth;
+  constructor(props) {
+    super(props);
+    this.resetState = this.resetState.bind(this);
+    this.getInitialState = this.getInitialState.bind(this);
+    this.push = this.push.bind(this);
+    this.pop = this.pop.bind(this);
+    this.state = this.getInitialState();
+  }
+
+  getInitialState() {
+    const initialMenu = (
+      <MenuContent
+        key="MenuPage-0"
+        onNext={this.push}
+        onBack={this.pop}
+        onClose={this.props.onRequestClose}
+        isFullScreen={this.props.isFullScreen}
+        index={0}
+      >
+        {this.props.items}
+      </MenuContent>
+    );
+
+    return {
+      stack: [initialMenu],
+    };
+  }
+
+  resetState() {
+    this.setState(prevState => ({
+      stack: [prevState.stack[0]],
+    }));
+  }
+
+  pop() {
+    this.setState((prevState) => {
+      prevState.stack.pop();
+      return { stack: prevState.stack };
+    });
+  }
+
+  push(content) {
+    this.setState((prevState) => {
+      prevState.stack.push(content);
+      return { stack: prevState.stack };
+    });
   }
 
   render() {
-    const onRequestClose = MenuNavStack.isFullScreen(
-      this.props.contentHeight,
-      this.props.contentHeightMax,
-      this.props.contentWidth,
-      this.props.contentWidthMax,
-    ) ? this.props.onRequestClose : null;
-    const cloneItems = this.props.items.map((item, i) => (
-      React.cloneElement(item, {
-        onBack: i > 0 ? this.props.onRequestBack : null,
-        onClose: onRequestClose,
-      })
-    ));
+    if (!this.props.isOpen && this.state.stack.length > 1) {
+      this.resetState();
+    }
+
     return (
-      <SlideGroup items={cloneItems} isAnimated />
+      <SlideGroup items={this.state.stack} isAnimated />
     );
   }
 

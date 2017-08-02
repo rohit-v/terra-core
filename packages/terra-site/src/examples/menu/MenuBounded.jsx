@@ -53,7 +53,8 @@ class MenuBounded extends React.Component {
           onRequestClose={this.handleRequestClose}
           contentWidth="240"
         >
-          <Menu.Item text="Default 1" key="1" />
+          <Menu.Item text="Default 1" key="1" isSelected isSelectable />
+          <Menu.Divider />
           <Menu.Item
             text="Default 2"
             key="2"
@@ -65,8 +66,9 @@ class MenuBounded extends React.Component {
           />
           <Menu.Item text="Default 3" key="3" onClick={() => alert('Default 3')} />
           <Menu.Item text="Default 4" key="4" />
+          <Menu.Divider />
           <Menu.Item text="Default 5" key="5" />
-          <Menu.ItemGroup isSelectable onChange={this.handleOnChange} key="6">
+          <Menu.ItemGroup key="6">
             <Menu.Item text="Default 61" key="61" />
             <Menu.Item text="Default 62" key="62" />
             <Menu.Item text="Default 63" key="63" />
