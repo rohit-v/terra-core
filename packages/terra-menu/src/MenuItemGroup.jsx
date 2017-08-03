@@ -15,13 +15,12 @@ const propTypes = {
   onChange: PropTypes.func,
 };
 
-const childContextTypes = {
-  isGroupItem: PropTypes.bool,
+const defaultProps = {
+  children: [],
 };
 
-const defaultProps = {
-  isSelectable: false,
-  children: [],
+const childContextTypes = {
+  isGroupItem: PropTypes.bool,
 };
 
 class MenuItemGroup extends React.Component {

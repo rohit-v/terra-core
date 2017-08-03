@@ -22,8 +22,11 @@ const MenuExamples = () => (
     <div id="version">Version: {version}</div>
     <Markdown id="readme" src={ReadMe} />
     <h2>Menu</h2>
-    <PropsTable id="props" src={MenuSrc} />
-
+    <PropsTable id="menu-props" src={MenuSrc} />
+    <h2>Menu.Item</h2>
+    <PropsTable id="menu-item-props" src={MenuItemSrc} />
+    <h2>Menu.ItemGroup</h2>
+    <PropsTable id="menu-item-group-props" src={MenuItemGroupSrc} />
     <h2>Menu</h2>
     <BasicMenu />
     <br />

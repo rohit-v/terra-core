@@ -62,9 +62,11 @@ class ArrowMenu extends React.Component {
                 text="Nested 1.2"
                 key="1.5"
                 subMenuItems={[
-                  <Menu.Item text="Toggle 1.2.1" key="1.2.1" isSelectable />,
-                  <Menu.Item text="Toggle 1.2.2" key="1.2.2" isSelectable />,
-                  <Menu.Item text="Toggle 1.2.3" key="1.2.3" isSelectable />,
+                  <Menu.ItemGroup key="1.2.1" >
+                    <Menu.Item text="Group Item 1.2.1" key="1.2.1.1" />
+                    <Menu.Item text="Group Item 1.2.2" key="1.2.1.2" />
+                    <Menu.Item text="Group Item 1.2.3" key="1.2.1.3" />
+                  </Menu.ItemGroup>,
                 ]}
               />,
               <Menu.Item
@@ -82,18 +84,30 @@ class ArrowMenu extends React.Component {
             text="Nested Menu 2"
             key="Nested2"
             subMenuItems={[
-              <Menu.Item text="Default 2.1" key="2.1" />,
-              <Menu.Item text="Default 2.2" key="2.2" />,
-              <Menu.Item text="Default 2.3" key="2.3" />,
+              <Menu.Item text="Toggle 2.1" key="2.1" isSelectable />,
+              <Menu.Item text="Toggle 2.2" key="2.2" isSelectable isSelected />,
+              <Menu.Item text="Toggle 2.3" key="2.3" isSelectable />,
               <Menu.Divider key="Divider2.1" />,
-              <Menu.Item text="Default 2.1" key="2.4" />,
-              <Menu.Item text="Default 2.2" key="2.5" />,
-              <Menu.Item text="Default 2.3" key="2.6" />,
+              <Menu.Item
+                text="Nested 2.1"
+                key="2.4"
+                subMenuItems={[
+                  <Menu.Item text="Toggle 2.1.1" key="2.1.1" isSelectable />,
+                  <Menu.Item text="Toggle 2.1.2" key="2.1.2" isSelectable />,
+                  <Menu.Item text="Toggle 2.1.3" key="2.1.3" isSelectable />,
+                ]}
+              />,
+              <Menu.Divider key="Divider2.2" />,
+              <Menu.ItemGroup key="2.2" >
+                <Menu.Item text="Group Item 2.2.1" key="2.2.1" />
+                <Menu.Item text="Group Item 2.2.2" key="2.2.2" />
+                <Menu.Item text="Group Item 2.2.3" key="2.2.3" />
+              </Menu.ItemGroup>,
             ]}
           />
           <Menu.Divider key="Divider2" />
-          <Menu.Item text="Action Item 1" key="Action1" onClick={() => alert('Action 1')} />
-          <Menu.Item text="Action Item 2" key="Action2" onClick={() => alert('Action 2')} />
+          <Menu.Item text="Alert Action" key="Action1" onClick={() => alert('Action 1')} />
+          <Menu.Item text="Close Action" key="Action2" onClick={this.handleRequestClose} />
           <Menu.Divider key="Divider3" />
           <Menu.ItemGroup key="Group">
             <Menu.Item text="Group Item 1" key="GroupItem1" />

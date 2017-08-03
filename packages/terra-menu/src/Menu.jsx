@@ -1,12 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'terra-popup';
+import SlideGroup from 'terra-slide-group';
+import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import MenuItem from './MenuItem';
 import MenuItemGroup from './MenuItemGroup';
 import MenuDivider from './MenuDivider';
-import MenuNavStack from './_MenuNavStack';
+import MenuContent from './_MenuContent';
 import MenuWidths from './_MenuWidths';
+import MenuUtils from './_MenuUtils';
+import styles from './Menu.scss';
+
+const cx = classNames.bind(styles);
 
 const propTypes = {
   /**
@@ -59,74 +65,43 @@ const defaultProps = {
   isOpen: false,
 };
 
-const childContextTypes = {
-  isSelectableMenu: PropTypes.bool,
-};
-
 const MENU_PADDING_TOP = 6;
 const MENU_PADDING_BOTTOM = 6;
 const MENU_ITEM_HEIGHT = 23;
 const MENU_DIVIDER_HEIGHT = 10;
 
 class Menu extends React.Component {
-  static getPopupHeight(contentHeight) {
-    if (contentHeight <= 40) {
-      return 40;
-    } else if (contentHeight <= 80) {
-      return 80;
-    } else if (contentHeight <= 120) {
-      return 120;
-    } else if (contentHeight <= 160) {
-      return 160;
-    } else if (contentHeight <= 240) {
-      return 240;
-    } else if (contentHeight <= 320) {
-      return 320;
-    } else if (contentHeight <= 400) {
-      return 400;
-    } else if (contentHeight <= 480) {
-      return 480;
-    } else if (contentHeight <= 560) {
-      return 560;
-    } else if (contentHeight <= 640) {
-      return 640;
-    } else if (contentHeight <= 720) {
-      return 720;
-    } else if (contentHeight <= 800) {
-      return 800;
-    }
-
-    return 880;
-  }
-
-  static isFullScreen(boundingFrame, popupHeight, popupWidth) {
-    const width = popupWidth;
-    const height = popupHeight;
-    let maxHeight;
-    let maxWidth;
-
-    if (boundingFrame) {
-      maxHeight = boundingFrame.clientHeight;
-      maxWidth = boundingFrame.clientWidth;
-    } else {
-      maxHeight = window.innerHeight;
-      maxWidth = window.innerWidth;
-    }
-
-    if (maxHeight <= 0 || maxWidth <= 0) {
-      return false;
-    }
-
-    return height >= maxHeight && width >= maxWidth;
-  }
-
   constructor(props) {
     super(props);
     this.getContentHeight = this.getContentHeight.bind(this);
+    this.resetState = this.resetState.bind(this);
+    this.getInitialState = this.getInitialState.bind(this);
+    this.push = this.push.bind(this);
+    this.pop = this.pop.bind(this);
+    this.state = this.getInitialState();
   }
 
-  getChildContext() {
-    return { isSelectableMenu: this.isSelectable() };
+  getInitialState() {
+    const contentHeight = this.getContentHeight();
+    this.popupHeight = MenuUtils.getPopupHeight(contentHeight);
+    const boundingFrame = this.props.boundingRef ? this.props.boundingRef() : undefined;
+    const isFullScreen = MenuUtils.isFullScreen(boundingFrame, this.popupHeight, MenuWidths[this.props.contentWidth]);
+
+    const initialMenu = (
+      <MenuContent
+        key="MenuPage-0"
+        onRequestNext={this.push}
+        onRequestBack={this.pop}
+        onRequestClose={isFullScreen ? this.props.onRequestClose : null}
+        index={0}
+      >
+        {this.props.children}
+      </MenuContent>
+    );
+
+    return {
+      stack: [initialMenu],
+    };
   }
 
   getContentHeight() {
@@ -147,17 +122,39 @@ class Menu extends React.Component {
     return (itemCount * MENU_ITEM_HEIGHT) + (dividerCount * MENU_DIVIDER_HEIGHT) + MENU_PADDING_TOP + MENU_PADDING_BOTTOM;
   }
 
-  isSelectable() {
-    for (let i = 0; i < this.props.children.length; i += 1) {
-      const child = this.props.children[i];
-      if (child.type === <MenuItemGroup />.type || child.isSelectable) {
-        return true;
-      }
-    }
-
-    return false;
+  pop() {
+    this.setState((prevState) => {
+      prevState.stack.pop();
+      return { stack: prevState.stack };
+    });
   }
 
+  push(item) {
+    const index = this.state.stack.length;
+    const content = (
+      <MenuContent
+        key={`MenuPage-${index}`}
+        title={item.props.text}
+        index={index}
+        onRequestBack={this.pop}
+        onRequestClose={this.props.onRequestClose}
+        onRequestNext={this.push}
+      >
+        {item.props.subMenuItems}
+      </MenuContent>
+    );
+
+    this.setState((prevState) => {
+      prevState.stack.push(content);
+      return { stack: prevState.stack };
+    });
+  }
+
+  resetState() {
+    this.setState(prevState => ({
+      stack: [prevState.stack[0]],
+    }));
+  }
 
   render() {
     const {
@@ -174,11 +171,10 @@ class Menu extends React.Component {
       ...customProps
     } = this.props;
     const attributes = Object.assign({}, customProps);
-    const boundingFrame = this.props.boundingRef ? this.props.boundingRef() : undefined;
 
-    const contentHeight = this.getContentHeight();
-    const popupHeight = Menu.getPopupHeight(contentHeight);
-    const isFullScreen = Menu.isFullScreen(boundingFrame, popupHeight, MenuWidths[contentWidth]);
+    if (!this.props.isOpen && this.state.stack.length > 1) {
+      this.resetState();
+    }
 
     return (
       <Popup
@@ -186,23 +182,16 @@ class Menu extends React.Component {
         boundingRef={boundingRef}
         isArrowDisplayed={isArrowDisplayed}
         contentAttachment={isArrowDisplayed ? 'bottom center' : 'bottom right'}
-        contentHeight={popupHeight.toString()}
-        classNameArrow={classNameArrow}
-        classNameContent={classNameContent}
+        contentHeight={this.popupHeight.toString()}
+        classNameArrow={cx(['arrow', classNameArrow])}
+        classNameContent={cx([{ submenu: this.state.stack.length > 1 }, classNameContent])}
         classNameOverlay={classNameOverlay}
         isOpen={isOpen}
         onRequestClose={onRequestClose}
         targetRef={targetRef}
         isHeaderDisabled
       >
-        <MenuNavStack
-          items={this.props.children}
-          onRequestClose={this.props.onRequestClose}
-          onRequestBack={this.pop}
-          onRequestNext={this.push}
-          isFullScreen={isFullScreen}
-          isOpen={isOpen}
-        />
+        <SlideGroup items={this.state.stack} isAnimated />
       </Popup>
     );
   }
@@ -210,7 +199,6 @@ class Menu extends React.Component {
 
 Menu.propTypes = propTypes;
 Menu.defaultProps = defaultProps;
-Menu.childContextTypes = childContextTypes;
 Menu.Item = MenuItem;
 Menu.ItemGroup = MenuItemGroup;
 Menu.Divider = MenuDivider;

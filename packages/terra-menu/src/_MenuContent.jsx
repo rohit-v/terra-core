@@ -7,54 +7,73 @@ import IconClose from 'terra-icon/lib/icon/IconClose';
 import Arrange from 'terra-arrange';
 import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
+import MenuItemGroup from './MenuItemGroup';
 import styles from './MenuContent.scss';
 
 const cx = classNames.bind(styles);
 
 const propTypes = {
+  /**
+   * Title the should be displayed in header
+   */
   title: PropTypes.string,
-  onBack: PropTypes.func,
-  onClose: PropTypes.func.isRequired,
-  onNext: PropTypes.func.isRequired,
+  /**
+   * Callback function for when close button is clicked
+   */
+  onRequestBack: PropTypes.func,
+  /**
+   * Callback function for when close button is clicked
+   */
+  onRequestClose: PropTypes.func,
+  /**
+   * Callback function that takes the content to be displayed next and is called when an item with nested content is clicked
+   */
+  onRequestNext: PropTypes.func.isRequired,
+  /**
+   * Menu Items/Menu Groups/Menu Dividers to be displayed
+   */
   children: PropTypes.node.isRequired,
+  /**
+   * Index within the Menu Stack
+   */
   index: PropTypes.number.isRequired,
-  isFullScreen: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {
   children: [],
 };
 
+const childContextTypes = {
+  isSelectableMenu: PropTypes.bool,
+};
+
 class MenuContent extends React.Component {
   constructor(props) {
     super(props);
-    this.handleItemSelection = this.handleItemSelection.bind(this);
     this.wrapOnClick = this.wrapOnClick.bind(this);
     this.buildHeader = this.buildHeader.bind(this);
+    this.isSelectable = this.isSelectable.bind(this);
   }
 
-  handleItemSelection(event, item) {
-    const index = this.props.index + 1;
+  getChildContext() {
+    return { isSelectableMenu: this.isSelectable() };
+  }
 
-    this.props.onNext((
-      <MenuContent
-        key={`MenuPage-${index}`}
-        title={item.props.text}
-        index={index}
-        onBack={this.props.onBack}
-        onClose={this.props.onClose}
-        onNext={this.props.onNext}
-        isFullScreen={this.props.isFullScreen}
-      >
-        {item.props.subMenuItems}
-      </MenuContent>
-    ));
+  isSelectable() {
+    for (let i = 0; i < this.props.children.length; i += 1) {
+      const child = this.props.children[i];
+      if (child.type === <MenuItemGroup />.type || child.props.isSelectable) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   wrapOnClick(item) {
     const onClick = item.props.onClick;
     return (event) => {
-      this.handleItemSelection(event, item);
+      this.props.onRequestNext(item);
 
       if (onClick) {
         onClick(event);
@@ -64,17 +83,17 @@ class MenuContent extends React.Component {
 
   buildHeader() {
     const shouldDisplayBack = this.props.index > 0;
-    if (this.props.title || shouldDisplayBack || this.props.isFullScreen) {
+    if (this.props.title || shouldDisplayBack || this.props.onRequestClose) {
       const closeIcon = <IconClose tabIndex="0" />;
-      const closeButton = this.props.isFullScreen ? (
-        <button className={cx(['header-button'])} onClick={this.props.onClose}>
+      const closeButton = this.props.onRequestClose ? (
+        <button className={cx(['header-button'])} onClick={this.props.onRequestClose}>
           {closeIcon}
         </button>
       ) : null;
 
       const backIcon = <IconLeft tabIndex="0" />;
       const backButton = shouldDisplayBack ? (
-        <button className={cx(['header-button'])} onClick={this.props.onBack}>
+        <button className={cx(['header-button'])} onClick={this.props.onRequestBack}>
           {backIcon}
         </button>
       ) : null;
@@ -83,7 +102,7 @@ class MenuContent extends React.Component {
 
       return (
         <Arrange
-          className={cx(['header', { fullscreen: this.props.onClose }])}
+          className={cx(['header', { fullscreen: this.props.onRequestClose }])}
           fitStart={backButton}
           fitEnd={closeButton}
           fill={titleElement}
@@ -96,9 +115,10 @@ class MenuContent extends React.Component {
   }
 
   render() {
+    const isSubMenu = this.props.index > 0;
     const items = React.Children.map(this.props.children, (item) => {
       if (item.props.subMenuItems && item.props.subMenuItems.length > 0) {
-        return React.cloneElement(item, { onClick: this.wrapOnClick(item) });
+        return React.cloneElement(item, { onClick: this.wrapOnClick(item), className: cx([{ submenu: isSubMenu }]) });
       }
 
       return item;
@@ -107,7 +127,7 @@ class MenuContent extends React.Component {
     const header = this.buildHeader();
 
     const className = cx([
-      { submenu: this.props.index > 0 },
+      { submenu: isSubMenu },
       { 'main-menu': this.props.index === 0 },
     ]);
 
@@ -124,5 +144,6 @@ class MenuContent extends React.Component {
 
 MenuContent.propTypes = propTypes;
 MenuContent.defaultProps = defaultProps;
+MenuContent.childContextTypes = childContextTypes;
 
 export default MenuContent;

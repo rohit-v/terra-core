@@ -40,9 +40,10 @@ const propTypes = {
    */
   subMenuItems: PropTypes.arrayOf(PropTypes.element),
 
+  /**
+   * Callback function for when item is clicked
+   */
   onClick: PropTypes.func,
-
-  onKeyDown: PropTypes.func,
 };
 
 const defaultProps = {
@@ -74,14 +75,16 @@ class MenuItem extends React.Component {
     }
   }
 
-  wrapOnKeyDown(event) {
-    if (event.nativeEvent.keyCode === KEYCODES.ENTER || event.nativeEvent.keyCode === KEYCODES.SPACE) {
-      this.handleSelection();
-    }
+  wrapOnKeyDown(onKeyDown) {
+    return ((event) => {
+      if (event.nativeEvent.keyCode === KEYCODES.ENTER || event.nativeEvent.keyCode === KEYCODES.SPACE) {
+        this.handleSelection();
+      }
 
-    if (this.props.onKeyDown) {
-      this.props.onKeyDown(event);
-    }
+      if (onKeyDown) {
+        onKeyDown(event);
+      }
+    });
   }
 
   render() {
@@ -102,7 +105,7 @@ class MenuItem extends React.Component {
 
     if (isSelectable && !isGroupItem) {
       attributes.onClick = this.wrapOnClick;
-      attributes.onKeyDown = this.wrapOnKeyDown;
+      attributes.onKeyDown = this.wrapOnKeyDown(attributes.onKeyDown);
     }
 
     const itemClassNames = cx([
