@@ -8,10 +8,12 @@ const MenuTests = () => (
     <ul>
       <li><Link to="/tests/menu-tests/default">Menu - Default</Link></li>
       <li><Link to="/tests/menu-tests/bounded">Menu - Bounded</Link></li>
-      <li><Link to="/tests/menu-tests/deminsions-100x">Menu - 100x Height</Link></li>
-      <li><Link to="/tests/menu-tests/deminsions-75x">Menu - 75x Height</Link></li>
-      <li><Link to="/tests/menu-tests/deminsions-50x">Menu - 50x Height</Link></li>
-      <li><Link to="/tests/menu-tests/deminsions-25x">Menu - 25x Height</Link></li>
+      <li><Link to="/tests/menu-tests/small">Menu - Small Height</Link></li>
+      <li><Link to="/tests/menu-tests/medium">Menu - Medium Height</Link></li>
+      <li><Link to="/tests/menu-tests/large">Menu - Large Height</Link></li>
+      <li><Link to="/tests/menu-tests/selectable">Menu - Selectable</Link></li>
+      <li><Link to="/tests/menu-tests/non-selectable">Menu - Not Selectable</Link></li>
+      <li><Link to="/tests/menu-tests/submenu">Menu - Submenu</Link></li>
     </ul>
   </div>
 );

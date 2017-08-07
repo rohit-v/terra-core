@@ -1,7 +1,7 @@
 import React from 'react';
 import Menu from '../../../lib/Menu';
 
-class DefaultMenu extends React.Component {
+class SmallMenu extends React.Component {
   constructor(props) {
     super(props);
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -30,12 +30,16 @@ class DefaultMenu extends React.Component {
   render() {
     return (
       <div>
+        <div>
+          This menu should have a small height. And all items should be visible without scrolling.
+        </div>
         <Menu
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
         >
-          <Menu.Item text="Default Menu" id="TestContent" />
+          <Menu.Item text="Default 1" key="1" className="TestFirstItem" />
+          <Menu.Item text="Default 2" key="2" className="TestLastItem" />
         </Menu>
         <button id="default-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
           Default Menu
@@ -45,4 +49,4 @@ class DefaultMenu extends React.Component {
   }
 }
 
-export default DefaultMenu;
+export default SmallMenu;

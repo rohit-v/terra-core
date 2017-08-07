@@ -15,7 +15,7 @@ import MenuItemGroupSrc from '!raw-loader!terra-menu/src/MenuItemGroup';
 // Example Files
 import BasicMenu from './BasicMenu';
 import MenuBounded from './MenuBounded';
-import ArrowMenu from './ArrowMenu';
+import MenuWidths from './MenuWidths';
 
 const MenuExamples = () => (
   <div>
@@ -31,9 +31,16 @@ const MenuExamples = () => (
     <BasicMenu />
     <br />
     <br />
-    <ArrowMenu />
-    <h2 id="bounded-popup" style={{ paddingTop: '20px' }}>Menu Bounded</h2>
+    <h2>Menu With Arrow</h2>
+    <BasicMenu isArrowDisplayed />
+    <br />
+    <br />
+    <h2>Menu Bounded</h2>
     <MenuBounded />
+    <br />
+    <br />
+    <h2>Menu Widths</h2>
+    <MenuWidths />
   </div>
 );
 

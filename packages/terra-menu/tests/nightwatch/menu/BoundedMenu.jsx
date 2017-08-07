@@ -1,14 +1,16 @@
 import React from 'react';
 import Menu from '../../../lib/Menu';
 
-class DefaultMenu extends React.Component {
+class BoundedMenu extends React.Component {
   constructor(props) {
     super(props);
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
-    this.state = { open: false };
+    this.setParentNode = this.setParentNode.bind(this);
+    this.getParentNode = this.getParentNode.bind(this);
+    this.state = { open: true };
   }
 
   setButtonNode(node) {
@@ -17,6 +19,14 @@ class DefaultMenu extends React.Component {
 
   getButtonNode() {
     return this.buttonNode;
+  }
+
+  setParentNode(node) {
+    this.parentNode = node;
+  }
+
+  getParentNode() {
+    return this.parentNode;
   }
 
   handleButtonClick() {
@@ -35,11 +45,13 @@ class DefaultMenu extends React.Component {
           isOpen={this.state.open}
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
+          classNameContent="TestBoundedContent"
         >
           <Menu.Item text="Default 1" key="1" />
           <Menu.Item
             text="Default 2"
             key="2"
+            className="TestNestedMenu"
             subMenuItems={[
               <Menu.Item text="Default 2.1" key="2.1" />,
               <Menu.Item text="Default 2.2" key="2.2" />,
@@ -55,7 +67,7 @@ class DefaultMenu extends React.Component {
             <Menu.Item text="Default 63" key="63" />
           </Menu.ItemGroup>
         </Menu>
-        <button id="default-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
+        <button id="bounded-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
           Default Menu
         </button>
       </div>
@@ -63,4 +75,4 @@ class DefaultMenu extends React.Component {
   }
 }
 
-export default DefaultMenu;
+export default BoundedMenu;

@@ -11,8 +11,20 @@ module.exports = {
     screenshot(browser, 'terra-menu-item-group', done);
   },
 
-  'Displays a default menu': (browser) => {
+  'Displays a default item group': (browser) => {
     browser
-      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-item-group-tests/default`);
+      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/menu-item-group-tests/default`)
+      .assert.elementPresent('.TestGroup')
+      .assert.elementPresent('.TestGroupItem1')
+      .assert.elementPresent('.TestGroupItem2')
+      .assert.elementPresent('.TestGroupItem3');
+  },
+  'Items in the item group are selectable': (browser) => {
+    browser
+      .click('.TestGroupItem1')
+      .assert.visible('.TestGroupItem1 svg[class*="_checkmark"]')
+      .click('.TestGroupItem3')
+      .assert.visible('.TestGroupItem3 svg[class*="_checkmark"]')
+      .assert.hidden('.TestGroupItem1 svg[class*="_checkmark"]');
   },
 };

@@ -63,6 +63,7 @@ const defaultProps = {
   isArrowDisplayed: false,
   children: [],
   isOpen: false,
+  contentWidth: '240',
 };
 
 const MENU_PADDING_TOP = 6;
@@ -74,7 +75,6 @@ class Menu extends React.Component {
   constructor(props) {
     super(props);
     this.getContentHeight = this.getContentHeight.bind(this);
-    this.resetState = this.resetState.bind(this);
     this.getInitialState = this.getInitialState.bind(this);
     this.push = this.push.bind(this);
     this.pop = this.pop.bind(this);
@@ -82,17 +82,12 @@ class Menu extends React.Component {
   }
 
   getInitialState() {
-    const contentHeight = this.getContentHeight();
-    this.popupHeight = MenuUtils.getPopupHeight(contentHeight);
-    const boundingFrame = this.props.boundingRef ? this.props.boundingRef() : undefined;
-    const isFullScreen = MenuUtils.isFullScreen(boundingFrame, this.popupHeight, MenuWidths[this.props.contentWidth]);
-
     const initialMenu = (
       <MenuContent
         key="MenuPage-0"
         onRequestNext={this.push}
         onRequestBack={this.pop}
-        onRequestClose={isFullScreen ? this.props.onRequestClose : null}
+        onRequestClose={this.props.onRequestClose}
         index={0}
       >
         {this.props.children}
@@ -102,6 +97,12 @@ class Menu extends React.Component {
     return {
       stack: [initialMenu],
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isOpen && !nextProps.isOpen) {
+      this.setState(this.getInitialState());
+    }
   }
 
   getContentHeight() {
@@ -150,12 +151,6 @@ class Menu extends React.Component {
     });
   }
 
-  resetState() {
-    this.setState(prevState => ({
-      stack: [prevState.stack[0]],
-    }));
-  }
-
   render() {
     const {
       boundingRef,
@@ -171,27 +166,36 @@ class Menu extends React.Component {
       ...customProps
     } = this.props;
     const attributes = Object.assign({}, customProps);
+    const contentHeight = this.getContentHeight();
+    const popupHeight = MenuUtils.getPopupHeight(contentHeight);
+    const boundingFrame = this.props.boundingRef ? this.props.boundingRef() : undefined;
+    const isFullScreen = MenuUtils.isFullScreen(boundingFrame, popupHeight, MenuWidths[this.props.contentWidth]);
 
-    if (!this.props.isOpen && this.state.stack.length > 1) {
-      this.resetState();
-    }
+    const isSubMenu = this.state.stack.length > 1;
+    const contentClass = cx([
+      { submenu: isSubMenu },
+      { 'main-menu': !isSubMenu },
+      { fullscreen: isFullScreen },
+      classNameContent,
+    ]);
 
     return (
       <Popup
         {...attributes}
         boundingRef={boundingRef}
         isArrowDisplayed={isArrowDisplayed}
-        contentAttachment={isArrowDisplayed ? 'bottom center' : 'bottom right'}
-        contentHeight={this.popupHeight.toString()}
+        contentAttachment={isArrowDisplayed ? 'top center' : 'top right'}
+        contentHeight={popupHeight.toString()}
+        contentWidth={this.props.contentWidth}
         classNameArrow={cx(['arrow', classNameArrow])}
-        classNameContent={cx([{ submenu: this.state.stack.length > 1 }, classNameContent])}
+        classNameContent={contentClass}
         classNameOverlay={classNameOverlay}
         isOpen={isOpen}
         onRequestClose={onRequestClose}
         targetRef={targetRef}
         isHeaderDisabled
       >
-        <SlideGroup items={this.state.stack} isAnimated />
+        <SlideGroup items={this.state.stack} />
       </Popup>
     );
   }

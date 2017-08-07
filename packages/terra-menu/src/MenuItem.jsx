@@ -54,12 +54,12 @@ const defaultProps = {
 };
 
 class MenuItem extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.wrapOnClick = this.wrapOnClick.bind(this);
     this.wrapOnKeyDown = this.wrapOnKeyDown.bind(this);
     this.handleSelection = this.handleSelection.bind(this);
-    this.state = { isSelected: props.isSelected && props.isSelectable };
+    this.state = { isSelected: props.isSelected && props.isSelectable && !context.isGroupItem };
   }
 
   handleSelection() {

@@ -5,7 +5,7 @@ import { Route } from 'react-router';
 import MenuItemGroupTests from './MenuItemGroupTests';
 
 // Test Cases
-import DefaultMenuItemGroup from './DefaultMenuItemGroup';
+import DefaultMenuItemGroup from './MenuItemGroupDefault';
 
 const routes = (
   <div>

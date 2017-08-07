@@ -8,7 +8,7 @@ import Arrange from 'terra-arrange';
 import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import MenuItemGroup from './MenuItemGroup';
-import styles from './MenuContent.scss';
+import styles from './Menu.scss';
 
 const cx = classNames.bind(styles);
 
@@ -41,6 +41,7 @@ const propTypes = {
 
 const defaultProps = {
   children: [],
+  title: '',
 };
 
 const childContextTypes = {
@@ -82,43 +83,37 @@ class MenuContent extends React.Component {
   }
 
   buildHeader() {
-    const shouldDisplayBack = this.props.index > 0;
-    if (this.props.title || shouldDisplayBack || this.props.onRequestClose) {
-      const closeIcon = <IconClose tabIndex="0" />;
-      const closeButton = this.props.onRequestClose ? (
-        <button className={cx(['header-button'])} onClick={this.props.onRequestClose}>
-          {closeIcon}
-        </button>
-      ) : null;
+    const closeIcon = <IconClose tabIndex="0" />;
+    const closeButton = this.props.onRequestClose ? (
+      <button className={cx(['header-button', 'close-button'])} onClick={this.props.onRequestClose}>
+        {closeIcon}
+      </button>
+    ) : null;
 
-      const backIcon = <IconLeft tabIndex="0" />;
-      const backButton = shouldDisplayBack ? (
-        <button className={cx(['header-button'])} onClick={this.props.onRequestBack}>
-          {backIcon}
-        </button>
-      ) : null;
+    const backIcon = <IconLeft tabIndex="0" />;
+    const backButton = this.props.index > 0 ? (
+      <button className={cx(['header-button'])} onClick={this.props.onRequestBack}>
+        {backIcon}
+      </button>
+    ) : null;
 
-      const titleElement = <h1 className={cx(['header-title'])}>{this.props.title}</h1>;
+    const titleElement = <h1 className={cx(['header-title'])}>{this.props.title}</h1>;
 
-      return (
-        <Arrange
-          className={cx(['header', { fullscreen: this.props.onRequestClose }])}
-          fitStart={backButton}
-          fitEnd={closeButton}
-          fill={titleElement}
-          align="center"
-        />
-      );
-    }
-
-    return null;
+    return (
+      <Arrange
+        className={cx(['header'])}
+        fitStart={backButton}
+        fitEnd={closeButton}
+        fill={titleElement}
+        align="center"
+      />
+    );
   }
 
   render() {
-    const isSubMenu = this.props.index > 0;
     const items = React.Children.map(this.props.children, (item) => {
       if (item.props.subMenuItems && item.props.subMenuItems.length > 0) {
-        return React.cloneElement(item, { onClick: this.wrapOnClick(item), className: cx([{ submenu: isSubMenu }]) });
+        return React.cloneElement(item, { onClick: this.wrapOnClick(item) });
       }
 
       return item;
@@ -126,14 +121,9 @@ class MenuContent extends React.Component {
 
     const header = this.buildHeader();
 
-    const className = cx([
-      { submenu: isSubMenu },
-      { 'main-menu': this.props.index === 0 },
-    ]);
-
     return (
-      <ContentContainer header={header} fill className={className}>
-        <List className={cx(['content'])}>
+      <ContentContainer header={header} fill className={cx(['content'])}>
+        <List className={cx(['list'])}>
           {items}
         </List>
       </ContentContainer>

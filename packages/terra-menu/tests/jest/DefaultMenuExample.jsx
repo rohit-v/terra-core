@@ -1,10 +1,9 @@
 import React from 'react';
-import Menu from '../../../lib/Menu';
+import Menu from '../../src/Menu';
 
-class DefaultMenu extends React.Component {
+class MenuDefaultExample extends React.Component {
   constructor(props) {
     super(props);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
@@ -19,10 +18,6 @@ class DefaultMenu extends React.Component {
     return this.buttonNode;
   }
 
-  handleButtonClick() {
-    this.setState({ open: true });
-  }
-
   handleRequestClose() {
     this.setState({ open: false });
   }
@@ -35,14 +30,12 @@ class DefaultMenu extends React.Component {
           targetRef={this.getButtonNode}
           onRequestClose={this.handleRequestClose}
         >
-          <Menu.Item text="Default Menu" id="TestContent" />
+          <Menu.Item text="testing" />
         </Menu>
-        <button id="default-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
-          Default Menu
-        </button>
+        <div style={{ height: '20px', width: '20px' }} ref={this.setButtonNode} />
       </div>
     );
   }
 }
 
-export default DefaultMenu;
+export default MenuDefaultExample;

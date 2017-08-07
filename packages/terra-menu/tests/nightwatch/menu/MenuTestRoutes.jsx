@@ -7,20 +7,24 @@ import MenuTests from './MenuTests';
 // Test Cases
 import DefaultMenu from './DefaultMenu';
 import BoundedMenu from './BoundedMenu';
-import Deminsions100xMenu from './Deminsions100xMenu';
-import Deminsions75xMenu from './Deminsions75xMenu';
-import Deminsions50xMenu from './Deminsions50xMenu';
-import Deminsions25xMenu from './Deminsions25xMenu';
+import LargeMenu from './LargeMenu';
+import MediumMenu from './MediumMenu';
+import SmallMenu from './SmallMenu';
+import SelectableMenu from './SelectableMenu';
+import NonSelectableMenu from './NonSelectableMenu';
+import SubMenu from './SubMenu';
 
 const routes = (
   <div>
     <Route path="/tests/menu-tests" component={MenuTests} />
     <Route path="/tests/menu-tests/default" component={DefaultMenu} />
     <Route path="/tests/menu-tests/bounded" component={BoundedMenu} />
-    <Route path="/tests/menu-tests/deminsions-100x" component={Deminsions100xMenu} />
-    <Route path="/tests/menu-tests/deminsions-75x" component={Deminsions75xMenu} />
-    <Route path="/tests/menu-tests/deminsions-50x" component={Deminsions50xMenu} />
-    <Route path="/tests/menu-tests/deminsions-25x" component={Deminsions25xMenu} />
+    <Route path="/tests/menu-tests/large" component={LargeMenu} />
+    <Route path="/tests/menu-tests/medium" component={MediumMenu} />
+    <Route path="/tests/menu-tests/small" component={SmallMenu} />
+    <Route path="/tests/menu-tests/selectable" component={SelectableMenu} />
+    <Route path="/tests/menu-tests/non-selectable" component={NonSelectableMenu} />
+    <Route path="/tests/menu-tests/submenu" component={SubMenu} />
   </div>
 );
 
