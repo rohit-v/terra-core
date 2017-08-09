@@ -74,11 +74,12 @@ class Magic extends React.Component {
     this.setContentNode = this.setContentNode.bind(this);
     this.getNodeRects = this.getNodeRects.bind(this);
     this.update = this.update.bind(this);
-    this.state = { isEnabled: this.props.isEnabled };
+    this.state = { isEnabled: props.isEnabled };
+    this.listenersAdded = false;
   }
 
   componentDidMount() {
-    if (this.state.isEnabled) {
+    if (this.state.isEnabled && !this.listenersAdded) {
       this.enable();
     }
     this.update();
@@ -86,13 +87,15 @@ class Magic extends React.Component {
 
   componentWillReceiveProps(newProps) {
     if (newProps.isEnabled !== this.props.isEnabled) {
-      this.setState({ isEnabled: newProps });
+      this.setState({ isEnabled: newProps.isEnabled });
     }
   }
 
   componentDidUpdate() {
     if (this.state.isEnabled) {
-      this.enable();
+      if (!this.listenersAdded) {
+        this.enable();
+      }
     } else {
       this.disable();
     }
@@ -115,15 +118,19 @@ class Magic extends React.Component {
   }
 
   enable() {
-    ['resize', 'scroll', 'touchmove'].forEach(event => window.addEventListener(event, this.update));
-
     const target = this.props.targetRef();
-    this.scrollParents = MagicUtils.getScrollParents(target);
-    this.scrollParents.forEach((parent) => {
-      if (parent !== target.ownerDocument) {
-        parent.addEventListener('scroll', this.update);
-      }
-    });
+    if (target) {
+      ['resize', 'scroll', 'touchmove'].forEach(event => window.addEventListener(event, this.update));
+
+      this.scrollParents = MagicUtils.getScrollParents(target);
+      this.scrollParents.forEach((parent) => {
+        if (parent !== target.ownerDocument) {
+          parent.addEventListener('scroll', this.update);
+        }
+      });
+
+      this.listenersAdded = true;
+    }
   }
 
   disable() {
@@ -137,6 +144,7 @@ class Magic extends React.Component {
         }
       });
     }
+    this.listenersAdded = false;
   }
 
   position(event) {
