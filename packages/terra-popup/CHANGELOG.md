@@ -3,6 +3,21 @@ Changelog
 
 Unreleased
 ----------
+### Changed
+* Switched CSS custom properties usage to inline fallback syntax
+
+1.3.0 - (August 8, 2017)
+------------------
+### Changed
+* Minor version bump
+
+1.2.0 - (August 1, 2017)
+------------------
+### Changed
+* Minor version bump
+
+1.1.0 - (August 1, 2017)
+------------------
 ### Added
 * Added requestFocus and releaseFocus props to support requesting and releasing focus.
 
