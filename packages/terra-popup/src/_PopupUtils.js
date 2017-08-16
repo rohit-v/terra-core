@@ -51,31 +51,40 @@ const mirrorAttachment = (attachment) => {
 const getContentOffset = (attachment, targetAttachment, targetNode, arrowOffset, cornerOffset) => {
   const offset = { vertical: 0, horizontal: 0 };
   if (targetNode) {
-    if (isVerticalAttachment(attachment) && targetNode.clientWidth <= (arrowOffset * 2) + cornerOffset) {
-      if (attachment.horizontal === 'left') {
-        offset.horizontal = (arrowOffset + cornerOffset) - (targetNode.clientWidth / 2);
-      } else if (attachment.horizontal === 'right') {
-        offset.horizontal = -((arrowOffset + cornerOffset) - (targetNode.clientWidth / 2));
-      }
-    } else {
-      if (attachment.horizontal !== targetAttachment.horizontal ) {
+    if (isVerticalAttachment(attachment)) {
+      if (targetNode.clientWidth <= (arrowOffset * 2) + cornerOffset) {
         if (attachment.horizontal === 'left') {
-          offset.horizontal = - arrowOffset - cornerOffset;
+          offset.horizontal = (arrowOffset + cornerOffset) - (targetNode.clientWidth / 2);
+        } else if (attachment.horizontal === 'right') {
+          offset.horizontal = -((arrowOffset + cornerOffset) - (targetNode.clientWidth / 2));
+        }
+      } else if (attachment.horizontal !== targetAttachment.horizontal ) {
+        if (attachment.horizontal === 'left') {
+          offset.horizontal = -arrowOffset - cornerOffset;
         } if (attachment.horizontal === 'right') {
           offset.horizontal = arrowOffset + cornerOffset;
         } else if (targetAttachment.horizontal === 'left'){
           offset.horizontal = -arrowOffset + cornerOffset;
         } else if (targetAttachment.horizontal === 'right'){
-          offset.horizontal = - arrowOffset - cornerOffset;
+          offset.horizontal = -arrowOffset - cornerOffset;
         }
       }
 
-      // TODO: investigate why this needs to be 2 instead of 1
+      // TODO: investigate why this needs to be 2 instead of 1, believe it's because 10 vs 11
       if (attachment.vertical === targetAttachment.vertical) {
         if (attachment.vertical === 'top') {
           offset.vertical = 2;
         } if (attachment.vertical === 'bottom') {
           offset.vertical = -2;
+        }
+      }
+    } else {
+      // TODO: investigate why this needs to be 2 instead of 1, believe it's because 10 vs 11
+      if (attachment.horizontal === targetAttachment.horizontal) {
+        if (attachment.horizontal === 'left') {
+          offset.horizontal = 2;
+        } if (attachment.vertical === 'right') {
+          offset.horizontal = -2;
         }
       }
     }
@@ -155,19 +164,19 @@ const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, corne
 /**
  * This method caculates the value to be applied to the left position of the popup arrow.
  */
-const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, contentOffset, attachment) => {
+const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, contentOffset, cAttachment, tAttachment) => {
   let offset;
-  if (contentOffset.horizontal !== 0 || attachment.horizontal === 'center') {
+  if (contentOffset.horizontal !== 0 || tAttachment.horizontal === 'center') { // might be able to update this to remove 0
     offset = (targetBounds.left - contentBounds.left) + arrowOffset + (targetBounds.width / 2);
-  } else if (attachment.horizontal === 'right') {
-    offset = (targetBounds.left - contentBounds.left) + (targetBounds.width - cornerOffset);
+  } else if (tAttachment.horizontal === 'right') {
+    offset = (targetBounds.left - contentBounds.left) + arrowOffset + targetBounds.width;
   } else {
-    offset = (targetBounds.left - contentBounds.left) + (2 * arrowOffset) + cornerOffset;
+    offset = (targetBounds.left - contentBounds.left) + arrowOffset;
   }
 
-  if (offset < 2 * arrowOffset) {
+  if (offset < (2 * arrowOffset) + cornerOffset) {
     offset = (2 * arrowOffset) + cornerOffset;
-  } else if (offset > contentBounds.width) {
+  } else if (offset > contentBounds.width - cornerOffset) {
     offset = contentBounds.width - cornerOffset;
   }
   return `${offset}px`;
@@ -177,8 +186,16 @@ const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, cont
 /**
  * This method caculates the value to be applied to the top position of the popup arrow.
  */
-const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset) => {
-  let offset = (targetBounds.top - contentBounds.top) + arrowOffset + (targetBounds.height / 2);
+const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, contentOffset, cAttachment, tAttachment) => {
+  let offset;
+  if (tAttachment.vertical === 'middle') {
+    offset = (targetBounds.top - contentBounds.top) + arrowOffset + (targetBounds.height / 2);
+  } else if (tAttachment.vertical === 'bottom') {
+    offset = (targetBounds.top - contentBounds.top) + arrowOffset + targetBounds.height;
+  } else {
+    offset = (targetBounds.top - contentBounds.top) + arrowOffset;
+  }
+
   if (offset < (2 * arrowOffset) + cornerOffset) {
     offset = (2 * arrowOffset) + cornerOffset;
   } else if (offset > contentBounds.height - cornerOffset) {

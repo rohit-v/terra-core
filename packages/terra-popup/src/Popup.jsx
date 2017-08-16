@@ -101,8 +101,8 @@ class Popup extends React.Component {
     this.setContentNode = this.setContentNode.bind(this);
   }
 
-  setArrowPosition(targetBounds, contentBounds, attachment, offset) {
-    const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, attachment);
+  setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment, offset) {
+    const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, cAttachment);
     if (!position) {
       this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttr);
       return;
@@ -110,11 +110,11 @@ class Popup extends React.Component {
     this.arrowNode.setAttribute(PopupArrow.Opts.positionAttr, position);
 
     if (position === 'top' || position === 'bottom') {
-      this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, offset, attachment);
+      this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, offset, cAttachment, tAttachment);
       this.arrowNode.style.top = '';
     } else {
       this.arrowNode.style.left = '';
-      this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
+      this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, offset, cAttachment, tAttachment);
     }
   }
 
@@ -126,9 +126,9 @@ class Popup extends React.Component {
     this.contentNode = node;
   }
 
-  handleOnPosition(event, targetBounds, contentBounds, attachment, offset) {
+  handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement, offset) {
     if (this.arrowNode && this.contentNode) {
-      this.setArrowPosition(targetBounds, contentBounds, attachment, offset);
+      this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement, offset);
     }
   }
 

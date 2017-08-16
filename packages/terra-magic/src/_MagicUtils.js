@@ -197,7 +197,7 @@ const getTargetCoords = (rect, attachment, offset) => {
   } else {
     attachmentCoords.x = rect.left;
   }
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical };
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, tAttachment: attachment };
 };
 
 const isValidCoords = (cAttachment, cCoords, cRect, bRect) => {
@@ -280,7 +280,7 @@ const getBasicContentCoords = (rect, attachment, offset, targetCoords, arrowDept
     }
   }
 
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, attachment, offset };
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, cAttachment: attachment, tAttachment: targetCoords.tAttachment, offset };
 };
 
 const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cAttachment, cOffset, bRect, arrowDepth) => {
@@ -289,28 +289,28 @@ const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cA
   }
 
   const mtCoords = mirrorTargetCoords(tRect, tAttachment, tOffset);
-  const mcAttachement = mirrorAttachment(cAttachment);
+  const mcAttachment = mirrorAttachment(cAttachment);
   const mcOffset = { vertical: -cOffset.vertical, horizontal: -cOffset.horizontal };
-  const mcCoords = getBasicContentCoords(cRect, mcAttachement, mcOffset, mtCoords, arrowDepth);
+  const mcCoords = getBasicContentCoords(cRect, mcAttachment, mcOffset, mtCoords, arrowDepth);
 
-  if (isValidCoords(mcAttachement, mcCoords, cRect, bRect)) {
+  if (isValidCoords(mcAttachment, mcCoords, cRect, bRect)) {
     return mcCoords; // 180 degree valid
   }
 
   const noOffset = { vertical: 0, horizontal: 0 };
-  let rcAttachement = rotateContentAttachment(cAttachment, '90');
-  let rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachement), noOffset);
-  let rcCoords = getBasicContentCoords(cRect, rcAttachement, noOffset, rtCoords, arrowDepth);
+  let rcAttachment = rotateContentAttachment(cAttachment, '90');
+  let rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachment), noOffset);
+  let rcCoords = getBasicContentCoords(cRect, rcAttachment, noOffset, rtCoords, arrowDepth);
 
-  if (isValidCoords(rcAttachement, rcCoords, cRect, bRect)) {
+  if (isValidCoords(rcAttachment, rcCoords, cRect, bRect)) {
     return rcCoords; // 90degree valid
   }
 
-  rcAttachement = rotateContentAttachment(cAttachment, '-90');
-  rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachement), noOffset);
-  rcCoords = getBasicContentCoords(cRect, rcAttachement, noOffset, rtCoords, arrowDepth);
+  rcAttachment = rotateContentAttachment(cAttachment, '-90');
+  rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachment), noOffset);
+  rcCoords = getBasicContentCoords(cRect, rcAttachment, noOffset, rtCoords, arrowDepth);
 
-  if (isValidCoords(rcAttachement, rcCoords, cRect, bRect)) {
+  if (isValidCoords(rcAttachment, rcCoords, cRect, bRect)) {
     return rcCoords; // -90degree valid
   }
 
@@ -338,7 +338,7 @@ const getBoundedContentCoords = (cCoords, cRect, bRect) => {
     attachmentCoords.y = cCoords.y;
   }
 
-  return { x: attachmentCoords.x, y: attachmentCoords.y, attachment: cCoords.attachment, offset: cCoords.offset };
+  return { x: attachmentCoords.x, y: attachmentCoords.y, cAttachment: cCoords.cAttachment, tAttachment: cCoords.tAttachment, offset: cCoords.offset };
 };
 
 const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, arrowDepth) => {
@@ -353,9 +353,9 @@ const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentO
 
   // Account for mobile zoom, this plays havoc with page offsets, so adjusting to fixed positioning.
   if (document.body.clientWidth / window.innerWidth > 1.0) {
-    return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px`, attachment: cFinal.attachment, offset: cFinal.offset };
+    return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px`, cAttachment: cFinal.attachment, tAttachment: cFinal.attachment, offset: cFinal.offset };
   }
-  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px`, attachment: cFinal.attachment, offset: cFinal.offset };
+  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px`, cAttachment: cFinal.cAttachment, tAttachment: cFinal.tAttachment, offset: cFinal.offset };
 };
 
 export default {
