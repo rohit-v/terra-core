@@ -72,6 +72,10 @@ const propTypes = {
    * A callback function to request focus from the containing component (e.g. modal).
    */
   requestFocus: PropTypes.func,
+  /**
+   * Attachment point for the target.
+   */
+  targetAttachment: PropTypes.oneOf(Magic.attachmentPositions),
 };
 
 const defaultProps = {
@@ -85,6 +89,7 @@ const defaultProps = {
   isArrowDisplayed: false,
   isHeaderDisabled: false,
   isOpen: false,
+  targetAttachment: 'bottom center',
 };
 
 class Popup extends React.Component {
@@ -143,7 +148,7 @@ class Popup extends React.Component {
 
     let arrow;
     if (showArrow) {
-      this.offset = PopupUtils.getContentOffset(this.attachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
+      this.offset = PopupUtils.getContentOffset(this.attachment, this.targetAttachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
       arrow = <PopupArrow className={this.props.classNameArrow} refCallback={this.setArrowNode} />;
     }
 
@@ -184,6 +189,7 @@ class Popup extends React.Component {
       releaseFocus,
       requestFocus,
       targetRef,
+      targetAttachment,
     } = this.props;
     /* eslint-enable no-unused-vars */
     this.offset = { vertical: 0, horizontal: 0 };
@@ -193,6 +199,12 @@ class Popup extends React.Component {
       bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
     }
     this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
+
+    let bidiTargetAttachment = targetAttachment;
+    if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
+      bidiTargetAttachment = PopupUtils.switchAttachmentToRTL(bidiTargetAttachment);
+    }
+    this.targetAttachment = PopupUtils.parseStringPair(bidiTargetAttachment);
 
     let magicContent = children;
     const showArrow = isArrowDisplayed && this.attachment !== 'middle center';
@@ -214,7 +226,7 @@ class Popup extends React.Component {
           isOpen={isOpen}
           onPosition={this.handleOnPosition}
           targetRef={targetRef}
-          targetAttachment={PopupUtils.mirrorAttachment(bidiContentAttachment)}
+          targetAttachment={bidiTargetAttachment}
         />
       </div>
     );

@@ -48,7 +48,7 @@ const mirrorAttachment = (attachment) => {
 /**
  * This method calculates a positional offset to be applied if the target is smaller than the arrow.
  */
-const getContentOffset = (attachment, targetNode, arrowOffset, cornerOffset) => {
+const getContentOffset = (attachment, targetAttachment, targetNode, arrowOffset, cornerOffset) => {
   const offset = { vertical: 0, horizontal: 0 };
   if (targetNode) {
     if (isVerticalAttachment(attachment) && targetNode.clientWidth <= (arrowOffset * 2) + cornerOffset) {
@@ -56,6 +56,27 @@ const getContentOffset = (attachment, targetNode, arrowOffset, cornerOffset) => 
         offset.horizontal = (arrowOffset + cornerOffset) - (targetNode.clientWidth / 2);
       } else if (attachment.horizontal === 'right') {
         offset.horizontal = -((arrowOffset + cornerOffset) - (targetNode.clientWidth / 2));
+      }
+    } else {
+      if (attachment.horizontal !== targetAttachment.horizontal ) {
+        if (attachment.horizontal === 'left') {
+          offset.horizontal = - arrowOffset - cornerOffset;
+        } if (attachment.horizontal === 'right') {
+          offset.horizontal = arrowOffset + cornerOffset;
+        } else if (targetAttachment.horizontal === 'left'){
+          offset.horizontal = -arrowOffset + cornerOffset;
+        } else if (targetAttachment.horizontal === 'right'){
+          offset.horizontal = - arrowOffset - cornerOffset;
+        }
+      }
+
+      // TODO: investigate why this needs to be 2 instead of 1
+      if (attachment.vertical === targetAttachment.vertical) {
+        if (attachment.vertical === 'top') {
+          offset.vertical = 2;
+        } if (attachment.vertical === 'bottom') {
+          offset.vertical = -2;
+        }
       }
     }
   }
@@ -152,6 +173,7 @@ const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, cont
   return `${offset}px`;
 };
 
+// TODO: needs revision, now that alternate values are possible
 /**
  * This method caculates the value to be applied to the top position of the popup arrow.
  */
