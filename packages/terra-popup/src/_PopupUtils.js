@@ -19,13 +19,6 @@ const isVerticalAttachment = attachment => (attachment.vertical !== 'middle');
 
 const primaryArrowPosition = attachment => (isVerticalAttachment(attachment) ? attachment.vertical : attachment.horizontal);
 
-const primaryMarginStyle = (attachment, margin) => {
-  if (isVerticalAttachment(attachment)) {
-    return attachment.vertical === 'top' ? { margin: `${margin}px 0 0 0` } : { margin: `0 0 ${margin}px 0` };
-  }
-  return attachment.horizontal === 'left' ? { margin: `0 0 0 ${margin}px` } : { margin: `0 ${margin}px 0 0` };
-};
-
 const switchAttachmentToRTL = (attachment) => {
   const parsedValue = parseStringPair(attachment);
   return `${parsedValue.vertical} ${MIRROR_LR[parsedValue.horizontal]}`;
@@ -48,43 +41,23 @@ const mirrorAttachment = (attachment) => {
 /**
  * This method calculates a positional offset to be applied if the target is smaller than the arrow.
  */
-const getContentOffset = (attachment, targetAttachment, targetNode, arrowOffset, cornerOffset) => {
+const getContentOffset = (cAttachment, tAttachment, targetNode, arrowOffset, cornerOffset) => {
   const offset = { vertical: 0, horizontal: 0 };
+  
   if (targetNode) {
-    if (isVerticalAttachment(attachment)) {
-      if (targetNode.clientWidth <= (arrowOffset * 2) + cornerOffset) {
-        if (attachment.horizontal === 'left') {
-          offset.horizontal = (arrowOffset + cornerOffset) - (targetNode.clientWidth / 2);
-        } else if (attachment.horizontal === 'right') {
-          offset.horizontal = -((arrowOffset + cornerOffset) - (targetNode.clientWidth / 2));
+    const segment = arrowOffset + cornerOffset;
+    if (isVerticalAttachment(cAttachment)) {
+      if (cAttachment.horizontal !== tAttachment.horizontal ) {
+        if (cAttachment.horizontal === 'left') {
+          offset.horizontal = -segment;
+        } if (cAttachment.horizontal === 'right') {
+          offset.horizontal = segment;
         }
-      } else if (attachment.horizontal !== targetAttachment.horizontal ) {
-        if (attachment.horizontal === 'left') {
-          offset.horizontal = -arrowOffset - cornerOffset;
-        } if (attachment.horizontal === 'right') {
-          offset.horizontal = arrowOffset + cornerOffset;
-        } else if (targetAttachment.horizontal === 'left'){
-          offset.horizontal = -arrowOffset + cornerOffset;
-        } else if (targetAttachment.horizontal === 'right'){
-          offset.horizontal = -arrowOffset - cornerOffset;
-        }
-      }
-
-      // TODO: investigate why this needs to be 2 instead of 1, believe it's because 10 vs 11
-      if (attachment.vertical === targetAttachment.vertical) {
-        if (attachment.vertical === 'top') {
-          offset.vertical = 2;
-        } if (attachment.vertical === 'bottom') {
-          offset.vertical = -2;
-        }
-      }
-    } else {
-      // TODO: investigate why this needs to be 2 instead of 1, believe it's because 10 vs 11
-      if (attachment.horizontal === targetAttachment.horizontal) {
-        if (attachment.horizontal === 'left') {
-          offset.horizontal = 2;
-        } if (attachment.vertical === 'right') {
-          offset.horizontal = -2;
+      } else if (targetNode.clientWidth < segment ) {
+        if (cAttachment.horizontal === 'left') {
+          offset.horizontal = segment;
+        } else if (cAttachment.horizontal === 'right') {
+          offset.horizontal = -segment;
         }
       }
     }
@@ -120,53 +93,48 @@ const arrowPositionFromBounds = (targetBounds, contentBounds, arrowOffset, corne
     if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
       return 'left';
     }
-  } else {
-    const overlaps = [];
-    // break the tie with a default attachment calculation
-    if (contentBounds.left + contentBounds.width > targetBounds.left && contentBounds.left + contentBounds.width < (targetBounds.left + targetBounds.width) - arrowOffset) {
-      if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
-        overlaps.push('right');
-      }
-    }
-    if (contentBounds.top + contentBounds.height > targetBounds.top && contentBounds.top + contentBounds.height < (targetBounds.top + targetBounds.height) - arrowOffset) {
-      if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
-        overlaps.push('bottom');
-      }
-    }
-    if (contentBounds.left > targetBounds.left + arrowOffset && contentBounds.left < targetBounds.left + targetBounds.width) {
-      if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
-        overlaps.push('left');
-      }
-    }
-    if (contentBounds.top > targetBounds.top + arrowOffset && contentBounds.top < targetBounds.top + targetBounds.height) {
-      if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
-        overlaps.push('top');
-      }
-    }
+  }
+  return getSecondaryArrowPosition(targetBounds, contentBounds, arrowOffset, cornerOffset, attachment);
+};
 
-    if (overlaps.length === 1) {
-      return overlaps[0];
-    } else if (overlaps.length >= 2) {
-      if (attachment.vertical === 'middle' && overlaps.indexOf(attachment.horizontal) >= 0) {
-        // check for left or right
-        return attachment.horizontal;
-      } else if (overlaps.indexOf(attachment.vertical) >= 0) {
-        // check for top or bottom
-        return attachment.vertical;
-      }
-      return overlaps[0];
+const getSecondaryArrowPosition = (targetBounds, contentBounds, arrowOffset, cornerOffset, attachment) => {
+  const overlaps = {};
+  overlaps.right = contentBounds.left + contentBounds.width >= targetBounds.left && contentBounds.left + contentBounds.width < (targetBounds.left + targetBounds.width) - arrowOffset;
+  overlaps.bottom = contentBounds.top + contentBounds.height >= targetBounds.top && contentBounds.top + contentBounds.height <= (targetBounds.top + targetBounds.height) - arrowOffset;
+  overlaps.left = contentBounds.left >= targetBounds.left + arrowOffset && contentBounds.left <= targetBounds.left + targetBounds.width;
+  overlaps.top = contentBounds.top >= targetBounds.top + arrowOffset && contentBounds.top <= targetBounds.top + targetBounds.height;
+
+  const positions = [];
+  if (overlaps.right || overlaps.left) {
+    if (doesArrowFitVertical(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+      if (overlaps.left) {positions.push('left');}
+      if (overlaps.right) {positions.push('right');}
     }
   }
 
-  return undefined;
-};
+  if (overlaps.bottom || overlaps.top) {
+    if (doesArrowFitHorizontal(targetBounds, contentBounds, arrowOffset, cornerOffset)) {
+      if (overlaps.top) {positions.push('top');}
+      if (overlaps.bottom) {positions.push('bottom');}
+    }
+  }
+
+  if (positions.length > 1) {
+    if (attachment.vertical === 'middle' && positions.indexOf(attachment.horizontal) >= 0) {
+      return attachment.horizontal;
+    } else if (positions.indexOf(attachment.vertical) >= 0) {
+      return attachment.vertical;
+    }
+  }
+  return positions[0];
+}
 
 /**
  * This method caculates the value to be applied to the left position of the popup arrow.
  */
-const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, contentOffset, cAttachment, tAttachment) => {
+const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAttachment) => {
   let offset;
-  if (contentOffset.horizontal !== 0 || tAttachment.horizontal === 'center') { // might be able to update this to remove 0
+  if (tAttachment.horizontal === 'center') { // might be able to update this to remove 0
     offset = (targetBounds.left - contentBounds.left) + arrowOffset + (targetBounds.width / 2);
   } else if (tAttachment.horizontal === 'right') {
     offset = (targetBounds.left - contentBounds.left) + arrowOffset + targetBounds.width;
@@ -182,11 +150,10 @@ const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, cont
   return `${offset}px`;
 };
 
-// TODO: needs revision, now that alternate values are possible
 /**
  * This method caculates the value to be applied to the top position of the popup arrow.
  */
-const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, contentOffset, cAttachment, tAttachment) => {
+const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAttachment) => {
   let offset;
   if (tAttachment.vertical === 'middle') {
     offset = (targetBounds.top - contentBounds.top) + arrowOffset + (targetBounds.height / 2);
@@ -208,7 +175,6 @@ const PopupUtils = {
   parseStringPair,
   isVerticalAttachment,
   primaryArrowPosition,
-  primaryMarginStyle,
   switchAttachmentToRTL,
   mirrorAttachment,
   getContentOffset,

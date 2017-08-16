@@ -10,10 +10,6 @@ const cx = classNames.bind(styles);
  */
 const ARROW_OFFSET = 11;
 /**
- * Depth of the arrow, to use for content positioning offset.
- */
-const ARROW_MARGIN = 10;
-/**
  * Directional attribute to be applied by a presenting component.
  */
 const ARROW_ATTR = 'data-align-arrow';
@@ -33,7 +29,6 @@ const PopupArrow = ({
 PopupArrow.propTypes = propTypes;
 PopupArrow.Opts = {
   arrowSize: ARROW_OFFSET,
-  arrowMargin: ARROW_MARGIN,
   positionAttr: ARROW_ATTR,
 };
 

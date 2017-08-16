@@ -89,7 +89,6 @@ const defaultProps = {
   isArrowDisplayed: false,
   isHeaderDisabled: false,
   isOpen: false,
-  targetAttachment: 'bottom center',
 };
 
 class Popup extends React.Component {
@@ -101,7 +100,7 @@ class Popup extends React.Component {
     this.setContentNode = this.setContentNode.bind(this);
   }
 
-  setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment, offset) {
+  setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment) {
     const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, cAttachment);
     if (!position) {
       this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttr);
@@ -110,11 +109,11 @@ class Popup extends React.Component {
     this.arrowNode.setAttribute(PopupArrow.Opts.positionAttr, position);
 
     if (position === 'top' || position === 'bottom') {
-      this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, offset, cAttachment, tAttachment);
+      this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment);
       this.arrowNode.style.top = '';
     } else {
       this.arrowNode.style.left = '';
-      this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, offset, cAttachment, tAttachment);
+      this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment);
     }
   }
 
@@ -126,9 +125,9 @@ class Popup extends React.Component {
     this.contentNode = node;
   }
 
-  handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement, offset) {
+  handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement) {
     if (this.arrowNode && this.contentNode) {
-      this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement, offset);
+      this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement);
     }
   }
 
@@ -194,13 +193,14 @@ class Popup extends React.Component {
     /* eslint-enable no-unused-vars */
     this.offset = { vertical: 0, horizontal: 0 };
 
+    // TODO: only parse once
     let bidiContentAttachment = contentAttachment;
     if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
       bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
     }
     this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
 
-    let bidiTargetAttachment = targetAttachment;
+    let bidiTargetAttachment = targetAttachment || PopupUtils.mirrorAttachment(contentAttachment);
     if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
       bidiTargetAttachment = PopupUtils.switchAttachmentToRTL(bidiTargetAttachment);
     }
@@ -217,7 +217,7 @@ class Popup extends React.Component {
       <div>
         {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
         <Magic
-          arrowDepth={showArrow ? PopupArrow.Opts.arrowMargin : 0}
+          arrowDepth={showArrow ? PopupArrow.Opts.arrowSize : 0}
           boundingRef={boundingRef}
           content={magicContent}
           contentAttachment={bidiContentAttachment}

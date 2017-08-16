@@ -219,6 +219,7 @@ class PopupContent extends React.Component {
     delete customProps.disableOnClickOutside;
     delete customProps.enableOnClickOutside;
 
+    // TODO: content div could be convert into MagicContent
     return (
       <FocusTrap>
         <div {...customProps} tabIndex="0" className={cx('popupContent')} ref={refCallback}>

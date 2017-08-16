@@ -52,7 +52,7 @@ const propTypes = {
   /**
    * String pair of top, middle, bottom, and left, center, right.
    */
-  targetAttachment: PropTypes.oneOf(ATTACHMENT_POSITIONS),
+  targetAttachment: PropTypes.oneOf(ATTACHMENT_POSITIONS).isRequired,
   /**
    * String pair of top and left offset, ie "10px -4px".
    */
