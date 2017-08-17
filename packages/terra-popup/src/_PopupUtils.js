@@ -133,13 +133,11 @@ const getSecondaryArrowPosition = (targetBounds, contentBounds, arrowOffset, cor
  * This method caculates the value to be applied to the left position of the popup arrow.
  */
 const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAttachment) => {
-  let offset;
-  if (tAttachment.horizontal === 'center') { // might be able to update this to remove 0
-    offset = (targetBounds.left - contentBounds.left) + arrowOffset + (targetBounds.width / 2);
+  let offset = (targetBounds.left - contentBounds.left) + arrowOffset
+  if (tAttachment.horizontal === 'center') {
+    offset += (targetBounds.width / 2);
   } else if (tAttachment.horizontal === 'right') {
-    offset = (targetBounds.left - contentBounds.left) + arrowOffset + targetBounds.width;
-  } else {
-    offset = (targetBounds.left - contentBounds.left) + arrowOffset;
+    offset += targetBounds.width;
   }
 
   if (offset < (2 * arrowOffset) + cornerOffset) {
@@ -154,13 +152,11 @@ const leftOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAtt
  * This method caculates the value to be applied to the top position of the popup arrow.
  */
 const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAttachment) => {
-  let offset;
+  let offset = (targetBounds.top - contentBounds.top) + arrowOffset;
   if (tAttachment.vertical === 'middle') {
-    offset = (targetBounds.top - contentBounds.top) + arrowOffset + (targetBounds.height / 2);
+    offset += (targetBounds.height / 2);
   } else if (tAttachment.vertical === 'bottom') {
-    offset = (targetBounds.top - contentBounds.top) + arrowOffset + targetBounds.height;
-  } else {
-    offset = (targetBounds.top - contentBounds.top) + arrowOffset;
+    offset += targetBounds.height;
   }
 
   if (offset < (2 * arrowOffset) + cornerOffset) {
