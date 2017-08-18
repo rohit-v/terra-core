@@ -1,33 +1,132 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import onClickOutside from 'react-onclickoutside';
 import './MagicContent.scss';
+
+/**
+ * Key code value for the escape key.
+ */
+const KEYCODES = {
+  ESCAPE: 27,
+};
 
 const propTypes = {
   /**
-   * Reference to the bonding container, wil use window if nothing is provided.
+   * The children to be displayed as content within the content.
    */
-  content: PropTypes.element.isRequired,
+  children: PropTypes.node.isRequired,
   /**
-   * Reference to the bonding container, wil use window if nothing is provided.
+   * The function that should be triggered when a close is indicated.
+   */
+  onRequestClose: PropTypes.func.isRequired,
+  /**
+   * Whether or not the using the escape key should trigger the onRequestClose callback.
+   */
+  closeOnEsc: PropTypes.bool,
+  /**
+   * Whether or not clicking outside the popup should trigger the onRequestClose callback.
+   */
+  closeOnOutsideClick: PropTypes.bool,
+  /**
+   * Whether or not resizing the screen should trigger the onRequestClose callback.
+   */
+  closeOnResize: PropTypes.bool,
+  /**
+   * The function returning the frame html reference.
    */
   refCallback: PropTypes.func,
 };
 
-const MagicContent = ({
-    content,
-    refCallback,
-    ...customProps
-  }) => {
-  // Delete the closePortal prop that comes from react-portal.
-  delete customProps.closePortal; // eslint-disable-line no-param-reassign
-
-  return (
-    <div {...customProps} className="terra-Magic-content" ref={refCallback}>
-      {content}
-    </div>
-  );
+const defaultProps = {
+  closeOnEsc: false,
+  closeOnOutsideClick: false,
+  closeOnResize: false,
 };
 
-MagicContent.propTypes = propTypes;
+class MagicContent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
+    this.handleResize = this.debounce(this.handleResize.bind(this), 100);
+  }
 
-export default MagicContent;
+  componentDidMount() {
+    if (this.props.closeOnEsc) {
+      document.addEventListener('keydown', this.handleKeydown);
+    }
+
+    if (this.props.closeOnResize) {
+      window.addEventListener('resize', this.handleResize);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.closeOnEsc) {
+      document.removeEventListener('keydown', this.handleKeydown);
+    }
+
+    if (this.props.closeOnResize) {
+      window.removeEventListener('resize', this.handleResize);
+    }
+  }
+
+  handleResize(event) {
+    if (this.props.closeOnResize && this.props.onRequestClose) {
+      this.props.onRequestClose(event);
+    }
+  }
+
+  handleClickOutside(event) {
+    if (this.props.closeOnOutsideClick && this.props.onRequestClose) {
+      this.props.onRequestClose(event);
+    }
+  }
+
+  handleKeydown(event) {
+    if (event.keyCode === KEYCODES.ESCAPE && this.props.onRequestClose) {
+      this.props.onRequestClose(event);
+      event.preventDefault();
+    }
+  }
+
+  debounce(fn, delay) {
+    let timer = null;
+    return (...args) => {
+      const context = this;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn.apply(context, args);
+      }, delay);
+    };
+  }
+
+  render() {
+    const {
+      children,
+      closeOnEsc,
+      closeOnOutsideClick,
+      closeOnResize,
+      onRequestClose,
+      refCallback,
+      ...customProps
+    } = this.props;
+
+    // Delete the disableOnClickOutside and enableOnClickOutside prop that comes from react-onclickoutside.
+    delete customProps.disableOnClickOutside;
+    delete customProps.enableOnClickOutside;
+    delete customProps.closePortal;
+
+    return (
+      <div {...customProps} className="terra-Magic-content" ref={refCallback}>
+        {children}
+      </div>
+    );
+  }
+}
+
+MagicContent.propTypes = propTypes;
+MagicContent.defaultProps = defaultProps;
+const onClickOutsideContent = onClickOutside(MagicContent);
+
+export default onClickOutsideContent;

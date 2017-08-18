@@ -93,10 +93,7 @@ const getBounds = (element) => {
   }
 
   const docEl = doc.documentElement;
-
   const box = getActualBoundingClientRect(currentElement);
-
-  // const origin = getOrigin(); // decide if needed later
   const origin = { top: 0, left: 0 };
 
   box.top -= origin.top;
@@ -119,12 +116,6 @@ const getBounds = (element) => {
 
 const getBoundingRect = (boundingElement) => {
   if (boundingElement === 'window') {
-    // return {
-    //   top: pageYOffset,
-    //   bottom: innerHeight + pageYOffset,
-    //   left: pageXOffset,
-    //   right: innerWidth + pageXOffset,
-    // };
     return {
       top: 0,
       bottom: innerHeight,
@@ -362,5 +353,7 @@ export default {
   getScrollParents,
   getBounds,
   getBoundingRect,
+  mirrorAttachment,
+  parseStringPair,
   positionStyleFromBounds,
 };

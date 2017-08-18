@@ -97,7 +97,6 @@ class Popup extends React.Component {
     super(props);
     this.handleOnPosition = this.handleOnPosition.bind(this);
     this.setArrowNode = this.setArrowNode.bind(this);
-    this.setContentNode = this.setContentNode.bind(this);
   }
 
   setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment) {
@@ -121,12 +120,8 @@ class Popup extends React.Component {
     this.arrowNode = node;
   }
 
-  setContentNode(node) {
-    this.contentNode = node;
-  }
-
   handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement) {
-    if (this.arrowNode && this.contentNode) {
+    if (this.arrowNode) {
       this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement);
     }
   }
@@ -147,7 +142,7 @@ class Popup extends React.Component {
 
     let arrow;
     if (showArrow) {
-      this.offset = PopupUtils.getContentOffset(this.attachment, this.targetAttachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
+      this.offset = PopupUtils.getContentOffset(this.cAttachment, this.tAttachment, this.props.targetRef(), PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize);
       arrow = <PopupArrow className={this.props.classNameArrow} refCallback={this.setArrowNode} />;
     }
 
@@ -156,12 +151,8 @@ class Popup extends React.Component {
         {...boundsProps}
         arrow={arrow}
         classNameInner={this.props.classNameContent}
-        closeOnEsc
-        closeOnOutsideClick
-        closeOnResize
         isHeaderDisabled={this.props.isHeaderDisabled}
         onRequestClose={this.props.onRequestClose}
-        refCallback={this.setContentNode}
         releaseFocus={this.props.releaseFocus}
         requestFocus={this.props.requestFocus}
       >
@@ -193,21 +184,22 @@ class Popup extends React.Component {
     /* eslint-enable no-unused-vars */
     this.offset = { vertical: 0, horizontal: 0 };
 
-    // TODO: only parse once
-    let bidiContentAttachment = contentAttachment;
+    this.cAttachment = Magic.Utils.parseStringPair(contentAttachment);
     if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
-      bidiContentAttachment = PopupUtils.switchAttachmentToRTL(bidiContentAttachment);
+      this.cAttachment = PopupUtils.switchAttachmentToRTL(this.cAttachment);
     }
-    this.attachment = PopupUtils.parseStringPair(bidiContentAttachment);
 
-    let bidiTargetAttachment = targetAttachment || PopupUtils.mirrorAttachment(contentAttachment);
-    if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
-      bidiTargetAttachment = PopupUtils.switchAttachmentToRTL(bidiTargetAttachment);
+    if (targetAttachment) {
+      this.tAttachment = Magic.Utils.parseStringPair(targetAttachment);
+      if (document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl') {
+        this.tAttachment = PopupUtils.switchAttachmentToRTL(this.tAttachment);
+      }
+    } else {
+      this.tAttachment = Magic.Utils.mirrorAttachment(this.cAttachment);
     }
-    this.targetAttachment = PopupUtils.parseStringPair(bidiTargetAttachment);
 
     let magicContent = children;
-    const showArrow = isArrowDisplayed && this.attachment !== 'middle center';
+    const showArrow = isArrowDisplayed && this.cAttachment !== 'middle center';
     if (isOpen) {
       const boundingFrame = boundingRef ? boundingRef() : undefined;
       magicContent = this.createPopupContent(boundingFrame, showArrow);
@@ -220,13 +212,13 @@ class Popup extends React.Component {
           arrowDepth={showArrow ? PopupArrow.Opts.arrowSize : 0}
           boundingRef={boundingRef}
           content={magicContent}
-          contentAttachment={bidiContentAttachment}
+          contentAttachment={`${this.cAttachment.vertical} ${this.cAttachment.horizontal}`}
           contentOffset={`${this.offset.vertical} ${this.offset.horizontal}`}
           isEnabled
           isOpen={isOpen}
           onPosition={this.handleOnPosition}
           targetRef={targetRef}
-          targetAttachment={bidiTargetAttachment}
+          targetAttachment={`${this.tAttachment.vertical} ${this.tAttachment.horizontal}`}
         />
       </div>
     );

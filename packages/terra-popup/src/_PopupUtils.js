@@ -4,38 +4,10 @@ const MIRROR_LR = {
   right: 'left',
 };
 
-const MIRROR_TB = {
-  middle: 'middle',
-  top: 'bottom',
-  bottom: 'top',
-};
-
-const parseStringPair = (value) => {
-  const [vertical, horizontal] = value.split(' ');
-  return { vertical, horizontal };
-};
-
 const isVerticalAttachment = attachment => (attachment.vertical !== 'middle');
 
-const primaryArrowPosition = attachment => (isVerticalAttachment(attachment) ? attachment.vertical : attachment.horizontal);
-
 const switchAttachmentToRTL = (attachment) => {
-  const parsedValue = parseStringPair(attachment);
-  return `${parsedValue.vertical} ${MIRROR_LR[parsedValue.horizontal]}`;
-};
-
-const mirrorAttachment = (attachment) => {
-  const parsedValue = parseStringPair(attachment);
-  let horizontal = parsedValue.horizontal;
-  let vertical = parsedValue.vertical;
-
-  if (isVerticalAttachment(parsedValue)) {
-    vertical = MIRROR_TB[parsedValue.vertical];
-  } else {
-    horizontal = MIRROR_LR[parsedValue.horizontal];
-  }
-
-  return `${vertical} ${horizontal}`;
+  return `${attachment.vertical} ${MIRROR_LR[attachment.horizontal]}`;
 };
 
 /**
@@ -168,11 +140,8 @@ const topOffset = (targetBounds, contentBounds, arrowOffset, cornerOffset, tAtta
 };
 
 const PopupUtils = {
-  parseStringPair,
   isVerticalAttachment,
-  primaryArrowPosition,
   switchAttachmentToRTL,
-  mirrorAttachment,
   getContentOffset,
   arrowPositionFromBounds,
   leftOffset,

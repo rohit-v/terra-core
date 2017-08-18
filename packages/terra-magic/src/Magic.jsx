@@ -26,7 +26,7 @@ const propTypes = {
    */
   boundingRef: PropTypes.func,
   /**
-   * The content to be magicked.
+   * The MagicContent to be magicked.
    */
   content: PropTypes.element.isRequired,
   /**
@@ -50,9 +50,9 @@ const propTypes = {
    */
   targetRef: PropTypes.func.isRequired,
   /**
-   * String pair of top, middle, bottom, and left, center, right.
+   * String pair of top, middle, bottom, and left, center, right. Will mirror content is none provided.
    */
-  targetAttachment: PropTypes.oneOf(ATTACHMENT_POSITIONS).isRequired,
+  targetAttachment: PropTypes.oneOf(ATTACHMENT_POSITIONS),
   /**
    * String pair of top and left offset, ie "10px -4px".
    */
@@ -149,7 +149,16 @@ class Magic extends React.Component {
 
   position(event) {
     let rects = this.getNodeRects();
-    const style = MagicUtils.positionStyleFromBounds(rects.boundingRect, rects.targetRect, rects.contentRect, this.props.contentOffset, this.props.targetOffset, this.props.contentAttachment, this.props.targetAttachment, this.props.arrowDepth);
+    const style = MagicUtils.positionStyleFromBounds(
+      rects.boundingRect,
+      rects.targetRect,
+      rects.contentRect,
+      this.props.contentOffset,
+      this.props.targetOffset,
+      this.props.contentAttachment,
+      (this.props.targetAttachment || MagicUtils.mirrorAttachment(this.props.contentAttachment)),
+      this.props.arrowDepth
+    );
     this.contentNode.style.position = style.position;
     this.contentNode.style.left = style.left;
     this.contentNode.style.top = style.top;
@@ -178,6 +187,22 @@ class Magic extends React.Component {
     this.position(event);
   }
 
+  cloneContent(content) {
+    return React.cloneElement(content, {refCallback: this.wrappedRefCallback(content)});
+  }
+
+  wrappedRefCallback(content) {
+    const initialRefCallback = content.props.refCallback;
+
+    return (node) => {
+      this.setContentNode(node);
+
+      if (initialRefCallback) {
+        initialRefCallback(node);
+      }
+    };
+  }
+
   render() {
     const {
       arrowDepth,
@@ -191,12 +216,13 @@ class Magic extends React.Component {
       targetAttachment,
       targetOffset,
       onPosition,
-      ...customProps
     } = this.props;
+
+    const clonedContent = this.cloneContent(content);
 
     return (
       <Portal isOpened={isOpen}>
-        <MagicContent {...customProps} content={content} refCallback={this.setContentNode} />
+        {clonedContent}
       </Portal>
     );
   }
@@ -205,5 +231,7 @@ class Magic extends React.Component {
 Magic.propTypes = propTypes;
 Magic.defaultProps = defaultProps;
 Magic.attachmentPositions = ATTACHMENT_POSITIONS;
+Magic.Utils = MagicUtils;
+Magic.Content = MagicContent;
 
 export default Magic;

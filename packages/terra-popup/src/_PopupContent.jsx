@@ -1,19 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
-import onClickOutside from 'react-onclickoutside';
 import ContentContainer from 'terra-content-container';
 import IconClose from 'terra-icon/lib/icon/IconClose';
 import FocusTrap from 'focus-trap-react';
+import Magic from 'terra-magic';
 import styles from './PopupContent.scss';
 
 const cx = classNames.bind(styles);
-/**
- * Key code value for the escape key.
- */
-const KEYCODES = {
-  ESCAPE: 27,
-};
 /**
  * Rounded corner size to be used when calculating the arrow offset.
  */
@@ -44,18 +38,6 @@ const propTypes = {
    * CSS classnames that are appended to the popup content body.
    */
   classNameInner: PropTypes.string,
-  /**
-   * Whether or not the using the escape key should trigger the onRequestClose callback.
-   */
-  closeOnEsc: PropTypes.bool,
-  /**
-   * Whether or not clicking outside the popup should trigger the onRequestClose callback.
-   */
-  closeOnOutsideClick: PropTypes.bool,
-  /**
-   * Whether or not resizing the screen should trigger the onRequestClose callback.
-   */
-  closeOnResize: PropTypes.bool,
   /**
    * The maximum height value in px, to be applied to the content container. Used with responsive behavior for actual height.
    */
@@ -113,69 +95,16 @@ class PopupContent extends React.Component {
     return height >= maxHeight && width >= maxWidth;
   }
 
-  constructor(props) {
-    super(props);
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-    this.handleKeydown = this.handleKeydown.bind(this);
-    this.handleResize = this.debounce(this.handleResize.bind(this), 100);
-  }
-
   componentDidMount() {
-    if (this.props.closeOnEsc) {
-      document.addEventListener('keydown', this.handleKeydown);
-    }
-
-    if (this.props.closeOnResize) {
-      window.addEventListener('resize', this.handleResize);
-    }
-
     if (this.props.requestFocus) {
       this.props.requestFocus();
     }
   }
 
   componentWillUnmount() {
-    if (this.props.closeOnEsc) {
-      document.removeEventListener('keydown', this.handleKeydown);
-    }
-
-    if (this.props.closeOnResize) {
-      window.removeEventListener('resize', this.handleResize);
-    }
-
     if (this.props.releaseFocus) {
       this.props.releaseFocus();
     }
-  }
-
-  handleResize(event) {
-    if (this.props.closeOnResize && this.props.onRequestClose) {
-      this.props.onRequestClose(event);
-    }
-  }
-
-  handleClickOutside(event) {
-    if (this.props.closeOnOutsideClick && this.props.onRequestClose) {
-      this.props.onRequestClose(event);
-    }
-  }
-
-  handleKeydown(event) {
-    if (event.keyCode === KEYCODES.ESCAPE && this.props.onRequestClose) {
-      this.props.onRequestClose(event);
-      event.preventDefault();
-    }
-  }
-
-  debounce(fn, delay) {
-    let timer = null;
-    return (...args) => {
-      const context = this;
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        fn.apply(context, args);
-      }, delay);
-    };
   }
 
   render() {
@@ -215,19 +144,23 @@ class PopupContent extends React.Component {
       classNameInner,
     ]);
 
-    // Delete the disableOnClickOutside and enableOnClickOutside prop that comes from react-onclickoutside.
-    delete customProps.disableOnClickOutside;
-    delete customProps.enableOnClickOutside;
-
-    // TODO: content div could be convert into MagicContent
     return (
       <FocusTrap>
-        <div {...customProps} tabIndex="0" className={cx('popupContent')} ref={refCallback}>
+        <Magic.Content
+          {...customProps}
+          tabIndex="0"
+          className={cx('popupContent')}
+          closeOnEsc
+          closeOnOutsideClick
+          closeOnResize
+          onRequestClose={onRequestClose}
+          refCallback={refCallback}
+        >
           {arrowContent}
           <div className={innerClassNames} style={contentStyle}>
             {content}
           </div>
-        </div>
+        </Magic.Content>
       </FocusTrap>
     );
   }
@@ -235,10 +168,8 @@ class PopupContent extends React.Component {
 
 PopupContent.propTypes = propTypes;
 PopupContent.defaultProps = defaultProps;
-
-const onClickOutsideContent = onClickOutside(PopupContent);
-onClickOutsideContent.Opts = {
+PopupContent.Opts = {
   cornerSize: CORNER_SIZE,
 };
 
-export default onClickOutsideContent;
+export default PopupContent;
