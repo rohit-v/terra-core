@@ -47,6 +47,10 @@ const propTypes = {
    */
   contentWidthMax: PropTypes.number,
   /**
+   * Whether or not the sizes provided were using predefined values. Dictates whether or not the bounded props are added to children.
+   */
+  isCustomSize: PropTypes.bool,
+  /**
    * Should the default behavior, that inserts a header when constraints are breached, be disabled.
    */
   isHeaderDisabled: PropTypes.bool,
@@ -76,9 +80,18 @@ const defaultProps = {
 
 class PopupContent extends React.Component {
   static getContentStyle(height, maxHeight, width, maxWidth) {
-    const validHeight = maxHeight <= 0 || height <= maxHeight ? height : maxHeight;
-    const validWidth = maxWidth <= 0 || width <= maxWidth ? width : maxWidth;
-    return { height: `${validHeight.toString()}px`, width: `${validWidth.toString()}px` };
+    const contentStyle = {};
+    let validHeight;
+    if (height > 0) {
+      validHeight = maxHeight <= 0 || height <= maxHeight ? height : maxHeight;
+      contentStyle.height = `${validHeight.toString()}px`;
+    }
+    let validWidth;
+    if (width > 0) {
+      validWidth = maxWidth <= 0 || width <= maxWidth ? width : maxWidth;
+      contentStyle.width = `${validWidth.toString()}px`;
+    }
+    return contentStyle;
   }
 
   static addPopupHeader(children, onRequestClose) {
@@ -88,11 +101,8 @@ class PopupContent extends React.Component {
     return <ContentContainer header={header} fill>{children}</ContentContainer>;
   }
 
-  static isFullScreen(height, maxHeight, width, maxWidth) {
-    if (maxHeight <= 0 || maxWidth <= 0) {
-      return false;
-    }
-    return height >= maxHeight && width >= maxWidth;
+  static isBounded(value, maxValue) {
+    return value > 0 && maxValue > 0 && value >= maxValue;
   }
 
   componentDidMount() {
@@ -107,6 +117,15 @@ class PopupContent extends React.Component {
     }
   }
 
+  cloneChildren(children, isCustomSize, isHeightBounded, isWidthBounded) {
+    if (!isCustomSize) {
+      return children;
+    }
+    return React.Children.map(children, (child) => {
+      return React.cloneElement(child, { isHeightBounded, isWidthBounded });
+    });
+  }
+
   render() {
     const {
       arrow,
@@ -117,6 +136,7 @@ class PopupContent extends React.Component {
       contentWidth,
       contentWidthMax,
       isHeaderDisabled,
+      isCustomSize,
       onRequestClose,
       refCallback,
       releaseFocus,
@@ -125,11 +145,13 @@ class PopupContent extends React.Component {
     } = this.props;
 
     const contentStyle = PopupContent.getContentStyle(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
-    const isFullScreen = PopupContent.isFullScreen(contentHeight, contentHeightMax, contentWidth, contentWidthMax);
+    const isHeightBounded = PopupContent.isBounded(contentHeight, contentHeightMax);
+    const isWidthBounded = PopupContent.isBounded(contentWidth, contentWidthMax);
+    const isFullScreen = isHeightBounded && isWidthBounded;
 
-    let content = children;
+    let content = this.cloneChildren(children, isCustomSize, isHeightBounded, isWidthBounded);
     if (isFullScreen && !isHeaderDisabled) {
-      content = PopupContent.addPopupHeader(children, onRequestClose);
+      content = PopupContent.addPopupHeader(content, onRequestClose);
     }
 
     const roundedCorners = arrow && !isFullScreen;

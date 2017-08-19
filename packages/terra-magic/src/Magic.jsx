@@ -46,6 +46,10 @@ const propTypes = {
    */
   isOpen: PropTypes.bool,
   /**
+   * Callback function when the magic is moved.
+   */
+  onPosition: PropTypes.func,
+  /**
    * Required element to be presented and magicked to.
    */
   targetRef: PropTypes.func.isRequired,
@@ -57,10 +61,6 @@ const propTypes = {
    * String pair of top and left offset, ie "10px -4px".
    */
   targetOffset: PropTypes.string,
-  /**
-   * Callback function when the magic is moved.
-   */
-  onPosition: PropTypes.func,
 };
 
 const defaultProps = {
@@ -79,10 +79,12 @@ class Magic extends React.Component {
   }
 
   componentDidMount() {
-    if (this.state.isEnabled && !this.listenersAdded) {
-      this.enable();
+    if (this.state.isEnabled) {
+      if (!this.listenersAdded) {
+        this.enableListeners();
+      }
+      this.update();
     }
-    this.update();
   }
 
   componentWillReceiveProps(newProps) {
@@ -94,12 +96,12 @@ class Magic extends React.Component {
   componentDidUpdate() {
     if (this.state.isEnabled) {
       if (!this.listenersAdded) {
-        this.enable();
+        this.enableListeners();
       }
+      this.update();
     } else {
-      this.disable();
+      this.disableListeners();
     }
-    this.update();
   }
 
   componentWillUnmount() {
@@ -117,7 +119,7 @@ class Magic extends React.Component {
     return { targetRect, contentRect, boundingRect };
   }
 
-  enable() {
+  enableListeners() {
     const target = this.props.targetRef();
     if (target) {
       ['resize', 'scroll', 'touchmove'].forEach(event => window.addEventListener(event, this.update));
@@ -133,7 +135,7 @@ class Magic extends React.Component {
     }
   }
 
-  disable() {
+  disableListeners() {
     ['resize', 'scroll', 'touchmove'].forEach(event => window.removeEventListener(event, this.update));
 
     const target = this.props.targetRef();
@@ -171,7 +173,7 @@ class Magic extends React.Component {
   }
 
   destroy() {
-    this.disable();
+    this.disableListeners();
     this.contentNode = null;
   }
 
@@ -188,7 +190,7 @@ class Magic extends React.Component {
   }
 
   cloneContent(content) {
-    return React.cloneElement(content, {refCallback: this.wrappedRefCallback(content)});
+    return React.cloneElement(content, { refCallback: this.wrappedRefCallback(content) });
   }
 
   wrappedRefCallback(content) {

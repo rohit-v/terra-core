@@ -97,6 +97,14 @@ class Popup extends React.Component {
     super(props);
     this.handleOnPosition = this.handleOnPosition.bind(this);
     this.setArrowNode = this.setArrowNode.bind(this);
+    this.validateContentNode = this.validateContentNode.bind(this);
+    this.isContentSized = props.contentHeight !== 'custom' && props.contentWidth !== 'custom';
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.isContentSized = newProps.contentHeight !== 'custom' && newProps.contentWidth !== 'custom';
+    this.contentHeight = null;
+    this.contentWidth = null;
   }
 
   setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment) {
@@ -126,13 +134,32 @@ class Popup extends React.Component {
     }
   }
 
+  validateContentNode(node) {
+    if (node) {
+      if (!this.isContentSized) {
+        this.isContentSized = true;
+        const contentRect = Magic.Utils.getBounds(node);
+        this.contentHeight = contentRect.height;
+        this.contentWidth = contentRect.width;
+        this.forceUpdate();
+      }
+    }
+  }
+
   createPopupContent(boundingFrame, showArrow) {
     const boundsProps = {
       contentHeight: PopupHeights[this.props.contentHeight] || PopupHeights['80'],
       contentWidth: PopupWidths[this.props.contentWidth] || PopupWidths['240'],
     };
+    if (boundsProps.contentHeight <= 0 && this.contentHeight) {
+      boundsProps.contentHeight = this.contentHeight;
+    }
+    if (boundsProps.contentWidth <= 0 && this.contentWidth) {
+      boundsProps.contentWidth = this.contentWidth;
+    }
 
     if (boundingFrame) {
+      // TODO: may need the bounding fancy...
       boundsProps.contentHeightMax = boundingFrame.clientHeight;
       boundsProps.contentWidthMax = boundingFrame.clientWidth;
     } else {
@@ -153,6 +180,7 @@ class Popup extends React.Component {
         classNameInner={this.props.classNameContent}
         isHeaderDisabled={this.props.isHeaderDisabled}
         onRequestClose={this.props.onRequestClose}
+        refCallback={this.validateContentNode}
         releaseFocus={this.props.releaseFocus}
         requestFocus={this.props.requestFocus}
       >
@@ -199,7 +227,7 @@ class Popup extends React.Component {
     }
 
     let magicContent = children;
-    const showArrow = isArrowDisplayed && this.cAttachment !== 'middle center';
+    const showArrow = isArrowDisplayed && !(this.cAttachment.vertical === 'middle' && this.cAttachment.horizontal === 'center');
     if (isOpen) {
       const boundingFrame = boundingRef ? boundingRef() : undefined;
       magicContent = this.createPopupContent(boundingFrame, showArrow);
@@ -214,7 +242,7 @@ class Popup extends React.Component {
           content={magicContent}
           contentAttachment={`${this.cAttachment.vertical} ${this.cAttachment.horizontal}`}
           contentOffset={`${this.offset.vertical} ${this.offset.horizontal}`}
-          isEnabled
+          isEnabled={this.isContentSized}
           isOpen={isOpen}
           onPosition={this.handleOnPosition}
           targetRef={targetRef}
