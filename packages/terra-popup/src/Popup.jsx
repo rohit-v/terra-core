@@ -99,12 +99,14 @@ class Popup extends React.Component {
     this.setArrowNode = this.setArrowNode.bind(this);
     this.validateContentNode = this.validateContentNode.bind(this);
     this.isContentSized = props.contentHeight !== 'custom' && props.contentWidth !== 'custom';
+    this.contentHeight = PopupHeights[props.contentHeight];
+    this.contentWidth = PopupWidths[props.contentWidth];
   }
 
   componentWillReceiveProps(newProps) {
     this.isContentSized = newProps.contentHeight !== 'custom' && newProps.contentWidth !== 'custom';
-    this.contentHeight = null;
-    this.contentWidth = null;
+    this.contentHeight = PopupHeights[newProps.contentHeight];
+    this.contentWidth = PopupWidths[newProps.contentWidth];
   }
 
   setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment) {
@@ -136,13 +138,13 @@ class Popup extends React.Component {
 
   validateContentNode(node) {
     if (node) {
-      if (!this.isContentSized) {
-        this.isContentSized = true;
-        const contentRect = Magic.Utils.getBounds(node);
+      const contentRect = Magic.Utils.getBounds(node);
+      if (this.contentHeight !== contentRect.height || this.contentWidth !== contentRect.width) {
         this.contentHeight = contentRect.height;
         this.contentWidth = contentRect.width;
         this.forceUpdate();
       }
+      this.isContentSized = true;
     }
   }
 
@@ -183,6 +185,8 @@ class Popup extends React.Component {
         refCallback={this.validateContentNode}
         releaseFocus={this.props.releaseFocus}
         requestFocus={this.props.requestFocus}
+        isHeightCustom={this.props.contentHeight === 'custom'}
+        isWidthCustom={this.props.contentWidth === 'custom'}
       >
         {this.props.children}
       </PopupContent>
