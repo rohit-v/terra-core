@@ -171,40 +171,6 @@ const parseOffset = (value) => {
   return { vertical: Number.parseFloat(pair.vertical), horizontal: Number.parseFloat(pair.horizontal) };
 };
 
-const getTargetCoords = (rect, attachment, offset) => {
-  const attachmentCoords = {};
-  if (attachment.vertical === 'middle') {
-    attachmentCoords.y = rect.top + (rect.height / 2);
-  } else if (attachment.vertical === 'bottom') {
-    attachmentCoords.y = rect.top + rect.height;
-  } else {
-    attachmentCoords.y = rect.top;
-  }
-
-  if (attachment.horizontal === 'center') {
-    attachmentCoords.x = rect.left + (rect.width / 2);
-  } else if (attachment.horizontal === 'right') {
-    attachmentCoords.x = rect.left + rect.width;
-  } else {
-    attachmentCoords.x = rect.left;
-  }
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, tAttachment: attachment, offset };
-};
-
-const isValidCoords = (cAttachment, cCoords, cRect, bRect) => {
-  if (cAttachment.vertical === 'middle') {
-    if (cAttachment.horizontal === 'right') {
-      return cCoords.x >= bRect.left;
-    } else if (cAttachment.horizontal === 'left') {
-      return cCoords.x + cRect.width  <= bRect.right;
-    }
-    return true;
-  } else if (cAttachment.vertical === 'top') {
-    return cCoords.y + cRect.height <= bRect.bottom;
-  }
-  return cCoords.y >= bRect.top;
-};
-
 const mirrorAttachment = (attachment) => {
   const mAttachment = {};
   if (attachment.vertical !== 'middle') {
@@ -251,110 +217,175 @@ const rotateContentAttachment = (attachment, angle) => {
   return rAttachment;
 };
 
-const getBasicContentCoords = (rect, attachment, offset, targetCoords, arrowDepth) => {
-  const attachmentCoords = {};
+const isValidPositions = (positions, cRect, bRect) => {
+  const cCoords = positions.cCoords;
+  const attachment = cCoords.attachment;
+  if (attachment.vertical === 'middle') {
+    if (attachment.horizontal === 'right') {
+      return cCoords.x >= bRect.left;
+    } else if (attachment.horizontal === 'left') {
+      return cCoords.x + cRect.width  <= bRect.right;
+    }
+    return true;
+  } else if (attachment.vertical === 'top') {
+    return cCoords.y + cRect.height <= bRect.bottom;
+  }
+  return cCoords.y >= bRect.top;
+};
+
+const getTargetCoords = (rect, attachment, offset) => {
+  const tCoords = {};
+  if (attachment.vertical === 'middle') {
+    tCoords.y = rect.top + (rect.height / 2);
+  } else if (attachment.vertical === 'bottom') {
+    tCoords.y = rect.top + rect.height;
+  } else {
+    tCoords.y = rect.top;
+  }
+
+  if (attachment.horizontal === 'center') {
+    tCoords.x = rect.left + (rect.width / 2);
+  } else if (attachment.horizontal === 'right') {
+    tCoords.x = rect.left + rect.width;
+  } else {
+    tCoords.x = rect.left;
+  }
+  return { x: tCoords.x + offset.horizontal, y: tCoords.y + offset.vertical, attachment, offset };
+};
+
+const getBasicPositions = (rect, attachment, offset, tCoords, margin) => {
+  const cCoords = {};
   if (attachment.vertical === 'middle') {
     if (attachment.horizontal === 'center') {
-      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+      cCoords.x = tCoords.x - (rect.width / 2);
     } else if (attachment.horizontal === 'right') {
-      attachmentCoords.x = targetCoords.x - rect.width - arrowDepth;
+      cCoords.x = tCoords.x - rect.width - margin;
     } else {
-      attachmentCoords.x = targetCoords.x + arrowDepth;
+      cCoords.x = tCoords.x + margin;
     }
 
-    attachmentCoords.y = targetCoords.y - (rect.height / 2);
+    cCoords.y = tCoords.y - (rect.height / 2);
   } else {
     if (attachment.horizontal === 'center') {
-      attachmentCoords.x = targetCoords.x - (rect.width / 2);
+      cCoords.x = tCoords.x - (rect.width / 2);
     } else if (attachment.horizontal === 'right') {
-      attachmentCoords.x = targetCoords.x - rect.width;
+      cCoords.x = tCoords.x - rect.width;
     } else {
-      attachmentCoords.x = targetCoords.x;
+      cCoords.x = tCoords.x;
     }
 
     if (attachment.vertical === 'bottom') {
-      attachmentCoords.y = targetCoords.y - rect.height - arrowDepth;
+      cCoords.y = tCoords.y - rect.height - margin;
     } else {
-      attachmentCoords.y = targetCoords.y + arrowDepth;
+      cCoords.y = tCoords.y + margin;
     }
   }
 
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, cAttachment: attachment, tAttachment: targetCoords.tAttachment, cOffset: offset, tOffset: targetCoords.offset };
+  return { 
+    cCoords: { 
+      x: cCoords.x + offset.horizontal,
+      y: cCoords.y + offset.vertical,
+      attachment,
+      offset,
+    },
+    tCoords,
+  };
 };
 
-const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cAttachment, cOffset, bRect, arrowDepth) => {
-  if (isValidCoords(cAttachment, cCoords, cRect, bRect)) {
-    return cCoords; // default valid
+const getRotatedPositions = (positions, cRect, bRect, tRect, margin) => {
+  if (isValidPositions(positions, cRect, bRect)) {
+    return positions; // default valid
   }
 
-  const mtCoords = mirrorTargetCoords(tRect, tAttachment, tOffset);
-  const mcAttachment = mirrorAttachment(cAttachment);
-  const mcOffset = mirrorOffset(cOffset, cAttachment);
-  const mcCoords = getBasicContentCoords(cRect, mcAttachment, mcOffset, mtCoords, arrowDepth);
+  let newOffset = mirrorOffset(positions.cCoords.offset, positions.cCoords.attachment);
+  let newAttachment = mirrorAttachment(positions.cCoords.attachment);
+  let newTCoords = mirrorTargetCoords(tRect, positions.tCoords.attachment, positions.tCoords.offset);
+  let newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidCoords(mcAttachment, mcCoords, cRect, bRect)) {
-    return mcCoords; // 180 degree valid
+  if (isValidPositions(newPositions, cRect, bRect)) {
+    return newPositions; // 180 degree valid
   }
 
-  const noOffset = { vertical: 0, horizontal: 0 };
-  let rcAttachment = rotateContentAttachment(cAttachment, '90');
-  let rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachment), noOffset);
-  let rcCoords = getBasicContentCoords(cRect, rcAttachment, noOffset, rtCoords, arrowDepth);
+  newOffset = { vertical: 0, horizontal: 0 };
+  newAttachment = rotateContentAttachment(positions.cCoords.attachment, '90');
+  newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
+  newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidCoords(rcAttachment, rcCoords, cRect, bRect)) {
-    return rcCoords; // 90degree valid
+  if (isValidPositions(newPositions, cRect, bRect)) {
+    return newPositions; // 90degree valid
   }
 
-  rcAttachment = rotateContentAttachment(cAttachment, '-90');
-  rtCoords = getTargetCoords(tRect, mirrorAttachment(rcAttachment), noOffset);
-  rcCoords = getBasicContentCoords(cRect, rcAttachment, noOffset, rtCoords, arrowDepth);
+  newAttachment = rotateContentAttachment(positions.cCoords.attachment, '-90');
+  newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
+  newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidCoords(rcAttachment, rcCoords, cRect, bRect)) {
-    return rcCoords; // -90degree valid
+  if (isValidPositions(newPositions, cRect, bRect)) {
+    return newPositions; // -90degree valid
   }
 
-  return cCoords;
+  return positions;
 };
 
-const getBoundedContentCoords = (cCoords, cRect, bRect) => {
-  const attachmentCoords = {};
+const getBoundedPositions = (positions, cRect, bRect) => {
+  const cCoords = {};
 
   // Bounds Checks Horizontal
-  if (bRect.left >= cCoords.x) {
-    attachmentCoords.x = bRect.left;
-  } else if (bRect.right <= cCoords.x + cRect.width) {
-    attachmentCoords.x = bRect.right - cRect.width;
+  if (bRect.left >= positions.cCoords.x) {
+    cCoords.x = bRect.left;
+  } else if (bRect.right <= positions.cCoords.x + cRect.width) {
+    cCoords.x = bRect.right - cRect.width;
   } else {
-    attachmentCoords.x = cCoords.x;
+    cCoords.x = positions.cCoords.x;
   }
 
   // Bounds Checks Vertical
-  if (bRect.top >= cCoords.y) {
-    attachmentCoords.y = bRect.top;
-  } else if (bRect.bottom <= cCoords.y + cRect.height) {
-    attachmentCoords.y = bRect.bottom - cRect.height;
+  if (bRect.top >= positions.cCoords.y) {
+    cCoords.y = bRect.top;
+  } else if (bRect.bottom <= positions.cCoords.y + cRect.height) {
+    cCoords.y = bRect.bottom - cRect.height;
   } else {
-    attachmentCoords.y = cCoords.y;
+    cCoords.y = positions.cCoords.y;
   }
 
-  return { x: attachmentCoords.x, y: attachmentCoords.y, cAttachment: cCoords.cAttachment, tAttachment: cCoords.tAttachment, cOffset: cCoords.cOffset, tOffset: cCoords.tOffset };
+  return { 
+    cCoords: { 
+      x: cCoords.x,
+      y: cCoords.y,
+      attachment: positions.cCoords.cAttachment,
+      offset: positions.cCoords.cOffset,
+    },
+    tCoords: positions.tCoords,
+  };
 };
 
-const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, arrowDepth) => {
+const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, margin) => {
   const cAttachment = parseStringPair(contentAttachment);
   const tAttachment = parseStringPair(targetAttachment);
   const cOffset = parseOffset(contentOffset);
   const tOffset = parseOffset(targetOffset);
   const tCoords = getTargetCoords(targetRect, tAttachment, tOffset);
-  const cCoords = getBasicContentCoords(contentRect, cAttachment, cOffset, tCoords, arrowDepth);
-  const cRotated = getRotatedContentCoords(targetRect, tAttachment, tOffset, cCoords, contentRect, cAttachment, cOffset, boundingRect, arrowDepth);
-  const cFinal = getBoundedContentCoords(cRotated, contentRect, boundingRect, arrowDepth);
+  let positions = getBasicPositions(contentRect, cAttachment, cOffset, tCoords, margin);
+  positions = getRotatedPositions(positions, contentRect, boundingRect, targetRect, margin);
+  positions = getBoundedPositions(positions, contentRect, boundingRect);
+
+  const result = { 
+    style: {
+      position: 'absolute',
+      left: `${positions.cCoords.x + pageXOffset}px`,
+      top: `${positions.cCoords.y + pageYOffset}px`,
+    },
+    positions,
+  };
 
   // Account for mobile zoom, this plays havoc with page offsets, so adjusting to fixed positioning.
   if (document.body.clientWidth / window.innerWidth > 1.0) {
-    return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px`, cAttachment: cFinal.attachment, tAttachment: cFinal.attachment, offset: cFinal.offset };
+    result.style = {
+      position: 'fixed',
+      left: `${positions.cCoords.x}px`,
+      top: `${positions.cCoords.y}px`,
+    };
   }
-  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px`, cAttachment: cFinal.cAttachment, tAttachment: cFinal.tAttachment, cOffset: cFinal.cOffset, tOffset: cFinal.tOffset };
+  return result;
 };
 
 export default {

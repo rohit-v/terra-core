@@ -151,7 +151,7 @@ class Magic extends React.Component {
 
   position(event) {
     let rects = this.getNodeRects();
-    const style = MagicUtils.positionStyleFromBounds(
+    const result = MagicUtils.positionStyleFromBounds(
       rects.boundingRect,
       rects.targetRect,
       rects.contentRect,
@@ -161,15 +161,20 @@ class Magic extends React.Component {
       (this.props.targetAttachment || MagicUtils.mirrorAttachment(this.props.contentAttachment)),
       this.props.arrowDepth
     );
-    this.contentNode.style.position = style.position;
-    this.contentNode.style.left = style.left;
-    this.contentNode.style.top = style.top;
+    this.contentNode.style.position = result.style.position;
+    this.contentNode.style.left = result.style.left;
+    this.contentNode.style.top = result.style.top;
     this.contentNode.style.transform = 'none';
 
     if (this.props.onPosition) {
-      // Get new content bounds, the target bounds will not have changed.
-      const contentRect = MagicUtils.getBounds(this.contentNode);
-      this.props.onPosition(event, rects.targetRect, contentRect, style.cAttachment, style.tAttachment, style.tOffset);
+      this.props.onPosition(
+        event,
+        rects.targetRect,
+        MagicUtils.getBounds(this.contentNode),
+        result.positions.cCoords.attachment,
+        result.positions.tCoords.attachment,
+        result.positions.tCoords.offset
+      );
     }
   }
 
