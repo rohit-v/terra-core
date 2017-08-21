@@ -292,35 +292,39 @@ const getBasicPositions = (rect, attachment, offset, tCoords, margin) => {
   };
 };
 
-const getRotatedPositions = (positions, cRect, bRect, tRect, margin) => {
+const getRotatedPositions = (positions, cRect, bRect, tRect, margin, behavior) => {
   if (isValidPositions(positions, cRect, bRect)) {
     return positions; // default valid
   }
 
-  let newOffset = mirrorOffset(positions.cCoords.offset, positions.cCoords.attachment);
-  let newAttachment = mirrorAttachment(positions.cCoords.attachment);
-  let newTCoords = mirrorTargetCoords(tRect, positions.tCoords.attachment, positions.tCoords.offset);
-  let newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
+  if (behavior !== 'none') {
+    let newOffset = mirrorOffset(positions.cCoords.offset, positions.cCoords.attachment);
+    let newAttachment = mirrorAttachment(positions.cCoords.attachment);
+    let newTCoords = mirrorTargetCoords(tRect, positions.tCoords.attachment, positions.tCoords.offset);
+    let newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidPositions(newPositions, cRect, bRect)) {
-    return newPositions; // 180 degree valid
-  }
+    if (isValidPositions(newPositions, cRect, bRect)) {
+      return newPositions; // 180 degree valid
+    }
 
-  newOffset = { vertical: 0, horizontal: 0 };
-  newAttachment = rotateContentAttachment(positions.cCoords.attachment, '90');
-  newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
-  newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
+    if (behavior === 'auto') {
+      newOffset = { vertical: 0, horizontal: 0 };
+      newAttachment = rotateContentAttachment(positions.cCoords.attachment, '90');
+      newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
+      newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidPositions(newPositions, cRect, bRect)) {
-    return newPositions; // 90degree valid
-  }
+      if (isValidPositions(newPositions, cRect, bRect)) {
+        return newPositions; // 90degree valid
+      }
 
-  newAttachment = rotateContentAttachment(positions.cCoords.attachment, '-90');
-  newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
-  newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
+      newAttachment = rotateContentAttachment(positions.cCoords.attachment, '-90');
+      newTCoords = getTargetCoords(tRect, mirrorAttachment(newAttachment), newOffset);
+      newPositions = getBasicPositions(cRect, newAttachment, newOffset, newTCoords, margin);
 
-  if (isValidPositions(newPositions, cRect, bRect)) {
-    return newPositions; // -90degree valid
+      if (isValidPositions(newPositions, cRect, bRect)) {
+        return newPositions; // -90degree valid
+      }
+    }
   }
 
   return positions;
@@ -362,14 +366,14 @@ const getBoundedPositions = (positions, cRect, bRect) => {
   };
 };
 
-const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, margin) => {
+const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, margin, behavior) => {
   const cAttachment = parseStringPair(contentAttachment);
   const tAttachment = parseStringPair(targetAttachment);
   const cOffset = parseOffset(contentOffset);
   const tOffset = parseOffset(targetOffset);
   const tCoords = getTargetCoords(targetRect, tAttachment, tOffset);
   let positions = getBasicPositions(contentRect, cAttachment, cOffset, tCoords, margin);
-  positions = getRotatedPositions(positions, contentRect, boundingRect, targetRect, margin);
+  positions = getRotatedPositions(positions, contentRect, boundingRect, targetRect, margin, behavior);
   positions = getBoundedPositions(positions, contentRect, boundingRect);
 
   const result = { 

@@ -16,11 +16,21 @@ const ATTACHMENT_POSITIONS = [
   'bottom right',
 ];
 
+const ATTACHMENT_BEHAVIORS = [
+  'auto',
+  'flip',
+  'none',
+];
+
 const propTypes = {
   /**
    * Depth in px of the margin to allow for an arrow.
    */
   arrowDepth: PropTypes.number,
+  /**
+   * If the primary attachment in not available, how should the content be positioned.
+   */
+  attachmentBehavior: PropTypes.oneOf(ATTACHMENT_BEHAVIORS),
   /**
    * Reference to the bonding container, wil use window if nothing is provided.
    */
@@ -64,6 +74,7 @@ const propTypes = {
 };
 
 const defaultProps = {
+  attachmentBehavior: 'auto',
   isEnabled: false,
   isOpen: false,
 };
@@ -159,7 +170,8 @@ class Magic extends React.Component {
       this.props.targetOffset,
       this.props.contentAttachment,
       (this.props.targetAttachment || MagicUtils.mirrorAttachment(this.props.contentAttachment)),
-      this.props.arrowDepth
+      this.props.arrowDepth,
+      this.props.attachmentBehavior,
     );
     this.contentNode.style.position = result.style.position;
     this.contentNode.style.transform = `translate3d(${result.style.left}, ${result.style.top}, 0px)`;

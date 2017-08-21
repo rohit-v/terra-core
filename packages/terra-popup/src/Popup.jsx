@@ -242,6 +242,7 @@ class Popup extends React.Component {
         {isOpen && <PopupOverlay className={this.props.classNameOverlay} />}
         <Magic
           arrowDepth={showArrow ? PopupArrow.Opts.arrowSize : 0}
+          attachmentBehavior="flip"
           boundingRef={boundingRef}
           content={magicContent}
           contentAttachment={`${this.cAttachment.vertical} ${this.cAttachment.horizontal}`}
