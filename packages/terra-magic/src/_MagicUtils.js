@@ -217,8 +217,16 @@ const mirrorAttachment = (attachment) => {
   return mAttachment;
 };
 
+const mirrorOffset = (offset, attachment) => {
+  const mAttachment = {};
+  if (attachment.vertical !== 'middle') {
+    return { vertical: -offset.vertical, horizontal: offset.horizontal };
+  }
+  return { vertical: offset.vertical, horizontal: -offset.horizontal };
+};
+
 const mirrorTargetCoords = (tRect, tAttachment, tOffset) => {
-  const mOffset = { vertical: -tOffset.vertical, horizontal: -tOffset.horizontal };
+  const mOffset = mirrorOffset(tOffset, tAttachment);
   const mAttachment = mirrorAttachment(tAttachment);
   return getTargetCoords(tRect, mAttachment, mOffset);
 };
@@ -281,7 +289,7 @@ const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cA
 
   const mtCoords = mirrorTargetCoords(tRect, tAttachment, tOffset);
   const mcAttachment = mirrorAttachment(cAttachment);
-  const mcOffset = { vertical: -cOffset.vertical, horizontal: -cOffset.horizontal };
+  const mcOffset = mirrorOffset(cOffset, cAttachment);
   const mcCoords = getBasicContentCoords(cRect, mcAttachment, mcOffset, mtCoords, arrowDepth);
 
   if (isValidCoords(mcAttachment, mcCoords, cRect, bRect)) {
