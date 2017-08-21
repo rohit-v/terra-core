@@ -167,8 +167,9 @@ class Magic extends React.Component {
     this.contentNode.style.transform = 'none';
 
     if (this.props.onPosition) {
-      rects = this.getNodeRects();
-      this.props.onPosition(event, rects.targetRect, rects.contentRect, style.cAttachment, style.tAttachment, style.tOffset);
+      // Get new content bounds, the target bounds will not have changed.
+      const contentRect = MagicUtils.getBounds(this.contentNode);
+      this.props.onPosition(event, rects.targetRect, contentRect, style.cAttachment, style.tAttachment, style.tOffset);
     }
   }
 
