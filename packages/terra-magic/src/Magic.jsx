@@ -162,9 +162,8 @@ class Magic extends React.Component {
       this.props.arrowDepth
     );
     this.contentNode.style.position = result.style.position;
-    this.contentNode.style.left = result.style.left;
-    this.contentNode.style.top = result.style.top;
-    this.contentNode.style.transform = 'none';
+    this.contentNode.style.transform = `translate3d(${result.style.left}, ${result.style.top}, 0px)`;
+    this.contentNode.style.opacity = '1.0';
 
     if (this.props.onPosition) {
       this.props.onPosition(
