@@ -184,17 +184,10 @@ const mirrorAttachment = (attachment) => {
 };
 
 const mirrorOffset = (offset, attachment) => {
-  const mAttachment = {};
   if (attachment.vertical !== 'middle') {
     return { vertical: -offset.vertical, horizontal: offset.horizontal };
   }
   return { vertical: offset.vertical, horizontal: -offset.horizontal };
-};
-
-const mirrorTargetCoords = (tRect, tAttachment, tOffset) => {
-  const mOffset = mirrorOffset(tOffset, tAttachment);
-  const mAttachment = mirrorAttachment(tAttachment);
-  return getTargetCoords(tRect, mAttachment, mOffset);
 };
 
 const rotateContentAttachment = (attachment, angle) => {
@@ -224,7 +217,7 @@ const isValidPositions = (positions, cRect, bRect) => {
     if (attachment.horizontal === 'right') {
       return cCoords.x >= bRect.left;
     } else if (attachment.horizontal === 'left') {
-      return cCoords.x + cRect.width  <= bRect.right;
+      return cCoords.x + cRect.width <= bRect.right;
     }
     return true;
   } else if (attachment.vertical === 'top') {
@@ -251,6 +244,12 @@ const getTargetCoords = (rect, attachment, offset) => {
     tCoords.x = rect.left;
   }
   return { x: tCoords.x + offset.horizontal, y: tCoords.y + offset.vertical, attachment, offset };
+};
+
+const mirrorTargetCoords = (tRect, tAttachment, tOffset) => {
+  const mOffset = mirrorOffset(tOffset, tAttachment);
+  const mAttachment = mirrorAttachment(tAttachment);
+  return getTargetCoords(tRect, mAttachment, mOffset);
 };
 
 const getBasicPositions = (rect, attachment, offset, tCoords, margin) => {
@@ -281,8 +280,8 @@ const getBasicPositions = (rect, attachment, offset, tCoords, margin) => {
     }
   }
 
-  return { 
-    cCoords: { 
+  return {
+    cCoords: {
       x: cCoords.x + offset.horizontal,
       y: cCoords.y + offset.vertical,
       attachment,
@@ -356,7 +355,7 @@ const getBoundedPositions = (positions, cRect, bRect) => {
 
   return {
     bounded,
-    cCoords: { 
+    cCoords: {
       x: cCoords.x,
       y: cCoords.y,
       attachment: positions.cCoords.cAttachment,
@@ -376,7 +375,7 @@ const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentO
   positions = getRotatedPositions(positions, contentRect, boundingRect, targetRect, margin, behavior);
   positions = getBoundedPositions(positions, contentRect, boundingRect);
 
-  const result = { 
+  const result = {
     style: {
       position: 'absolute',
       left: `${positions.cCoords.x + pageXOffset}px`,

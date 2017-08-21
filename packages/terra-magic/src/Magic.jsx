@@ -161,7 +161,7 @@ class Magic extends React.Component {
   }
 
   position(event) {
-    let rects = this.getNodeRects();
+    const rects = this.getNodeRects();
     const result = MagicUtils.positionStyleFromBounds(
       rects.boundingRect,
       rects.targetRect,
@@ -184,7 +184,7 @@ class Magic extends React.Component {
         MagicUtils.getBounds(this.contentNode),
         result.positions.cCoords.attachment,
         result.positions.tCoords.attachment,
-        result.positions.tCoords.offset
+        result.positions.tCoords.offset,
       );
     }
   }
@@ -223,6 +223,7 @@ class Magic extends React.Component {
   }
 
   render() {
+    /* eslint-disable no-unused-vars */
     const {
       arrowDepth,
       boundingRef,
@@ -236,7 +237,7 @@ class Magic extends React.Component {
       targetOffset,
       onPosition,
     } = this.props;
-
+    /* eslint-enable no-unused-vars */
     const clonedContent = this.cloneContent(content);
 
     return (
