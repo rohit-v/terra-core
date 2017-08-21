@@ -328,6 +328,7 @@ const getRotatedPositions = (positions, cRect, bRect, tRect, margin) => {
 
 const getBoundedPositions = (positions, cRect, bRect) => {
   const cCoords = {};
+  let bounded = false;
 
   // Bounds Checks Horizontal
   if (bRect.left >= positions.cCoords.x) {
@@ -341,13 +342,16 @@ const getBoundedPositions = (positions, cRect, bRect) => {
   // Bounds Checks Vertical
   if (bRect.top >= positions.cCoords.y) {
     cCoords.y = bRect.top;
+    bounded = true;
   } else if (bRect.bottom <= positions.cCoords.y + cRect.height) {
     cCoords.y = bRect.bottom - cRect.height;
+    bounded = true;
   } else {
     cCoords.y = positions.cCoords.y;
   }
 
-  return { 
+  return {
+    bounded,
     cCoords: { 
       x: cCoords.x,
       y: cCoords.y,
@@ -378,7 +382,7 @@ const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentO
   };
 
   // Account for mobile zoom, this plays havoc with page offsets, so adjusting to fixed positioning.
-  if (document.body.clientWidth / window.innerWidth > 1.0) {
+  if (positions.bounded || document.body.clientWidth / window.innerWidth > 1.0) {
     result.style = {
       position: 'fixed',
       left: `${positions.cCoords.x}px`,
