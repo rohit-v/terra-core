@@ -188,7 +188,7 @@ const getTargetCoords = (rect, attachment, offset) => {
   } else {
     attachmentCoords.x = rect.left;
   }
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, tAttachment: attachment };
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, tAttachment: attachment, offset };
 };
 
 const isValidCoords = (cAttachment, cCoords, cRect, bRect) => {
@@ -271,7 +271,7 @@ const getBasicContentCoords = (rect, attachment, offset, targetCoords, arrowDept
     }
   }
 
-  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, cAttachment: attachment, tAttachment: targetCoords.tAttachment, offset };
+  return { x: attachmentCoords.x + offset.horizontal, y: attachmentCoords.y + offset.vertical, cAttachment: attachment, tAttachment: targetCoords.tAttachment, cOffset: offset, tOffset: targetCoords.offset };
 };
 
 const getRotatedContentCoords = (tRect, tAttachment, tOffset, cCoords, cRect, cAttachment, cOffset, bRect, arrowDepth) => {
@@ -329,7 +329,7 @@ const getBoundedContentCoords = (cCoords, cRect, bRect) => {
     attachmentCoords.y = cCoords.y;
   }
 
-  return { x: attachmentCoords.x, y: attachmentCoords.y, cAttachment: cCoords.cAttachment, tAttachment: cCoords.tAttachment, offset: cCoords.offset };
+  return { x: attachmentCoords.x, y: attachmentCoords.y, cAttachment: cCoords.cAttachment, tAttachment: cCoords.tAttachment, cOffset: cCoords.cOffset, tOffset: cCoords.tOffset };
 };
 
 const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentOffset, targetOffset, contentAttachment, targetAttachment, arrowDepth) => {
@@ -346,7 +346,7 @@ const positionStyleFromBounds = (boundingRect, targetRect, contentRect, contentO
   if (document.body.clientWidth / window.innerWidth > 1.0) {
     return { position: 'fixed', left: `${cFinal.x}px`, top: `${cFinal.y}px`, cAttachment: cFinal.attachment, tAttachment: cFinal.attachment, offset: cFinal.offset };
   }
-  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px`, cAttachment: cFinal.cAttachment, tAttachment: cFinal.tAttachment, offset: cFinal.offset };
+  return { position: 'absolute', left: `${cFinal.x + pageXOffset}px`, top: `${cFinal.y + pageYOffset}px`, cAttachment: cFinal.cAttachment, tAttachment: cFinal.tAttachment, cOffset: cFinal.cOffset, tOffset: cFinal.tOffset };
 };
 
 export default {

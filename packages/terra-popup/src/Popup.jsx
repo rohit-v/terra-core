@@ -109,8 +109,8 @@ class Popup extends React.Component {
     this.contentWidth = PopupWidths[newProps.contentWidth];
   }
 
-  setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachment) {
-    const position = PopupUtils.arrowPositionFromBounds(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, cAttachment);
+  setArrowPosition(tBounds, cBounds, cAttachment, tAttachment, tOffset) {
+    const position = PopupUtils.arrowPositionFromBounds(tBounds, cBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, cAttachment);
     if (!position) {
       this.arrowNode.removeAttribute(PopupArrow.Opts.positionAttr);
       return;
@@ -118,11 +118,11 @@ class Popup extends React.Component {
     this.arrowNode.setAttribute(PopupArrow.Opts.positionAttr, position);
 
     if (position === 'top' || position === 'bottom') {
-      this.arrowNode.style.left = PopupUtils.leftOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment);
+      this.arrowNode.style.left = PopupUtils.leftOffset(tBounds, cBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment, tOffset);
       this.arrowNode.style.top = '';
     } else {
       this.arrowNode.style.left = '';
-      this.arrowNode.style.top = PopupUtils.topOffset(targetBounds, contentBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment);
+      this.arrowNode.style.top = PopupUtils.topOffset(tBounds, cBounds, PopupArrow.Opts.arrowSize, PopupContent.Opts.cornerSize, tAttachment, tOffset);
     }
   }
 
@@ -130,9 +130,9 @@ class Popup extends React.Component {
     this.arrowNode = node;
   }
 
-  handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement) {
+  handleOnPosition(event, targetBounds, contentBounds, cAttachment, tAttachement, tOffset) {
     if (this.arrowNode) {
-      this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement);
+      this.setArrowPosition(targetBounds, contentBounds, cAttachment, tAttachement, tOffset);
     }
   }
 

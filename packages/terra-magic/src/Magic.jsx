@@ -168,7 +168,7 @@ class Magic extends React.Component {
 
     if (this.props.onPosition) {
       rects = this.getNodeRects();
-      this.props.onPosition(event, rects.targetRect, rects.contentRect, style.cAttachment, style.tAttachment, style.offset);
+      this.props.onPosition(event, rects.targetRect, rects.contentRect, style.cAttachment, style.tAttachment, style.tOffset);
     }
   }
 
